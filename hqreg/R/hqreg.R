@@ -37,9 +37,6 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
   # Constant for quantile loss
   c <- 2*tau-1
 
-  # For Huber loss, scale gamma accordingly when the response is standardized
-
-
   # Setup vector d for generating the lambda sequence
   d <- 0
   user <- 0
