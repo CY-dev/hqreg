@@ -9,8 +9,8 @@
 double ksav(double *a, int size, int K);
 
 static double sign(double x) {
-  if(x>0.00000000001) return 1.0;
-  else if(x<-0.00000000001) return -1.0;
+  if(x > 0) return 1.0;
+  else if(x < 0) return -1.0;
   else return 0.0;
 }
 
