@@ -1,0 +1,12 @@
+1.0
+	* Added support for L2 penalization(alpha=0);
+	* hqreg: changed argument "loss" to "method" and an option "squared" to "ls".
+
+1.1
+	* loss.hqreg.R: corrected a mistake in function "qloss".
+
+1.2
+	* cv.hqreg: added two new arguments, "fold.id" for predefined cross-validation 
+	  folds, and "type.measure" for inclusion of general error measures "mse" and 
+	  "mae".
+	* loss.hqreg: modified definition depending on "type.measure".
