@@ -14,4 +14,4 @@
 	* hqreg: changed argument "loss" to "method" and an option "squared" to "ls".
 
 1.2-1
-  * corrected typos in documentation
+	* corrected typos in documentation
