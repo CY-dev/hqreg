@@ -13,3 +13,6 @@
 
 1.2-1
 	* corrected typos in documentation
+
+1.2-2
+  * removed redundancy and reduced memory allocation in hqreg.c
