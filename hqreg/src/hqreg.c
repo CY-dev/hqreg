@@ -535,10 +535,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	    // Update r, dk, ddk and compute candidate of max_update
             shift = beta[lp+j]-beta_old[j];
             if(shift!=0) {
-<<<<<<< HEAD
-=======
 	      v2 = 0.0;
->>>>>>> e7b4a1a73aa4e9ac7fc87ddc10bbb0cab36afcd7
               for(i=0; i<n; i++) {
 		r[i] -= x[jn+i]*shift;
                 if(fabs(r[i])>gamma) {
@@ -547,16 +544,10 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                 } else {
 		  dk[i] = r[i]/gamma+c;
 		  ddk[i] = 1.0/gamma;
-<<<<<<< HEAD
-	        }
-	      }
-	      v2 += 2*l2*pf[j];
-=======
 	          //v2 += x2[jn+i]*ddk[i];
 	        }
 	      }
 	      //v2 += 2*n*l2*pf[j];
->>>>>>> e7b4a1a73aa4e9ac7fc87ddc10bbb0cab36afcd7
 	      //update = v2*shift*shift;
               //Rprintf("loss decrease = %f, penalty decrease = %f\n", v2*shift*shift, 2*n*l1*pf[j]*fabs(fabs(beta[lp+j])-fabs(beta_old[j])));
               update = n*(v2*shift*shift + 2*fabs(v1*shift));
