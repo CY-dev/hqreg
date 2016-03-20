@@ -9,7 +9,7 @@
 Package: \tab hqreg\cr
 Type: \tab Package\cr
 Version: \tab 1.2-1\cr
-Date: \tab 2016-02-16\cr
+Date: \tab 2016-03-19\cr
 License: \tab GPL-3\cr
 }
 Very simple to use. Accepts \code{X,y} data for regression models, and

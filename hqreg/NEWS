@@ -10,3 +10,8 @@
 	  folds, and "type.measure" for inclusion of general error measures "mse" and 
 	  "mae".
 	* loss.hqreg: modified definition depending on "type.measure".
+	* Added support for L2 penalization(alpha=0).
+	* hqreg: changed argument "loss" to "method" and an option "squared" to "ls".
+
+1.2-1
+  * corrected typos in documentation

@@ -4,16 +4,23 @@
 \description{Perform k-fold cross validation for elastic-net penalized Huber loss regression 
   and quantile regression over a sequence of lambda values and find an optimal lambda.}
 \usage{
+<<<<<<< HEAD
 cv.hqreg(X, y, ..., nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), 
          seed, trace=FALSE)
+=======
+cv.hqreg(X, y, ..., nfolds=10, seed, trace=FALSE)
+>>>>>>> e7b4a1a73aa4e9ac7fc87ddc10bbb0cab36afcd7
 }
 \arguments{
   \item{X}{The input matrix, as in \code{hqreg}.}
   \item{y}{The response vector, as in \code{hqreg}.}
   \item{...}{Additional arguments to \code{hqreg}.}
   \item{nfolds}{The number of cross-validation folds. Default is 10.}
+<<<<<<< HEAD
   \item{fold.id}{(Optional) a vector of values between 1 and nfold indicating which fold each observation belongs to. If supplied, nfolds can be missing. By default the observations are randomly assigned by \code{cv.hqreg}. }
   \item{type.measure}{The default is "deviance", which uses the chosen loss function of the model. Other options include "mse" for mean squared error and "mae" for mean absolute error.}
+=======
+>>>>>>> e7b4a1a73aa4e9ac7fc87ddc10bbb0cab36afcd7
   \item{seed}{Seed for the random number generator in order to obtain reproducible results.}
   \item{trace}{If set to TRUE, cv.hqreg will inform the user of its
     progress by announcing the beginning of each CV fold.  Default is
@@ -23,7 +30,11 @@ cv.hqreg(X, y, ..., nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae
 The function randomly partitions the data in \code{nfolds}. It calls \code{hqreg} 
 \code{nfolds}+1 times, the first to obtain the \code{lambda} sequence, and the remainder 
 to fit with each of the folds left out once for validation. The cross-validation error is 
+<<<<<<< HEAD
 the average of validation errors for the \code{nfolds} fits.
+=======
+the average of validation errors of the \code{nfolds} fits, which are computed using the loss function of the model.
+>>>>>>> e7b4a1a73aa4e9ac7fc87ddc10bbb0cab36afcd7
 
 Note that \code{cv.hqreg} does not search for values of \code{alpha}, \code{gamma} or \code{tau}. 
 Specific values should be supplied, otherwise the default ones for \code{hqreg} are used. 
