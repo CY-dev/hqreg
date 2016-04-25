@@ -1,4 +1,4 @@
-loss.hqreg <- function(y, yhat, args) {
+measure.hqreg <- function(y, yhat, args) {
   r <- y-yhat
   type.measure <- args$type.measure
   if (type.measure == "deviance") {
