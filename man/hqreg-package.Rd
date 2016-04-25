@@ -8,13 +8,13 @@
 \tabular{ll}{
 Package: \tab hqreg\cr
 Type: \tab Package\cr
-Version: \tab 1.2-3\cr
+Version: \tab 1.2-4\cr
 Date: \tab 2016-04-24\cr
 License: \tab GPL-3\cr
 }
 Very simple to use. Accepts \code{X,y} data for regression models, and
 produces the regularization path over a grid of values for the tuning
-parameter \code{lambda}. Also provides methods for plotting, prediction and cross-validation.
+parameter \code{lambda}. Also provides functions for plotting, prediction and parallelized cross-validation.
 }
 \author{Congrui Yi <congrui-yi@uiowa.edu>}
 \examples{
