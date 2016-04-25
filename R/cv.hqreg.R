@@ -1,13 +1,13 @@
 cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), 
                      seed, trace=FALSE) {
-  type.measure <- match.arg(type.measure)
+  type.measure = match.arg(type.measure)
   if (!missing(seed)) set.seed(seed)
   fit <- hqreg(X, y, ...)
   cv.args <- list(...)
   cv.args$lambda <- fit$lambda
   cv.args$gamma <- fit$gamma
-  loss.args <- list(method = fit$method, gamma = fit$gamma, tau = fit$tau, type.measure = type.measure)
-  E <- matrix(NA, nrow = length(y), ncol = length(cv.args$lambda))
+  loss.args <- list(method=fit$method, gamma=fit$gamma, tau=fit$tau, type.measure = type.measure)
+  E <- matrix(NA, nrow=length(y), ncol=length(cv.args$lambda))
   n <- length(y)
   if(missing(fold.id)) fold.id <- ceiling(sample(1:n)/n*nfolds)
   
@@ -15,7 +15,10 @@ cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c
   if (ncores > 1) {
     max.cores <- detectCores()
     if (ncores > max.cores) {
-      stop("The number of cores specified (", ncores, ") is larger than the number of avaiable cores (", max.cores, ")!")
+      print(paste("The number of cores specified (", ncores, ") is larger 
+                  than the number of avaiable cores (", max.cores, ") so",
+                  max.cores, " cores are used.", sep = ""))
+      ncores = max.cores
     }
     cluster <- makeCluster(ncores)
     if (!("cluster" %in% class(cluster))) stop("Cluster is not of class 'cluster'; see ?makeCluster")
@@ -65,5 +68,5 @@ cvf <- function(i, XX, y, fold.id, cv.args, loss.args) {
   
   yhat <- matrix(predict(fit.i, X2), length(y2))
   
-  list(pe = measure.hqreg(y2, yhat, loss.args), nl = length(fit.i$lambda))
+  list(pe = loss.hqreg(y2, yhat, loss.args), nl = length(fit.i$lambda))
 }
