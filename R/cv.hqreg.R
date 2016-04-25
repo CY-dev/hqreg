@@ -65,5 +65,5 @@ cvf <- function(i, XX, y, fold.id, cv.args, loss.args) {
   
   yhat <- matrix(predict(fit.i, X2), length(y2))
   
-  list(pe = loss.hqreg(y2, yhat, loss.args), nl = length(fit.i$lambda))
+  list(pe = measure.hqreg(y2, yhat, loss.args), nl = length(fit.i$lambda))
 }
