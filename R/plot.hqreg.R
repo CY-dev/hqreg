@@ -6,13 +6,13 @@ plot.hqreg <- function(x, xvar = c("lambda", "norm"), log.l = TRUE, nvars = TRUE
   p <- nrow(Y)
   if (xvar == "lambda") {
     X <- x$lambda
-    if (log.x) X <- log(X)
+    if (log.l) X <- log(X)
   } else {
     X <- colSums(abs(Y))
   }
   
   if (xvar == "lambda") {
-    xlab <- if (log.x) expression(log(lambda)) else expression(lambda)
+    xlab <- if (log.l) expression(log(lambda)) else expression(lambda)
     xlim <- rev(range(X))
   } else {
     xlab <- expression(group("||", hat(beta), "||")[1])
