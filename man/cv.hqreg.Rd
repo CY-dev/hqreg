@@ -4,17 +4,25 @@
 \description{Perform k-fold cross validation for elastic-net penalized Huber loss regression 
   and quantile regression over a sequence of lambda values and find an optimal lambda.}
 \usage{
-cv.hqreg(X, y, ..., nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), 
-         seed, trace=FALSE)
+cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, type.measure = c("deviance", "mse", "mae"), 
+         seed, trace = FALSE)
 }
 \arguments{
   \item{X}{The input matrix, as in \code{hqreg}.}
   \item{y}{The response vector, as in \code{hqreg}.}
   \item{...}{Additional arguments to \code{hqreg}.}
+  \item{ncores}{\code{cv.hqreg} can be run in parallel across a
+  cluster using the \code{parallel} package. If \code{ncores > 1},a cluster is 
+  created to run \code{cv.hqreg} in parallel. The code is run sequentially if 
+  \code{ncores = 1} (the default). An error occurs if \code{ncores} is larger than the
+  total number of available cores.}
   \item{nfolds}{The number of cross-validation folds. Default is 10.}
-  \item{fold.id}{(Optional) a vector of values between 1 and nfold indicating which fold each observation belongs to. If supplied, nfolds can be missing. By default the observations are randomly assigned by \code{cv.hqreg}. }
-  \item{type.measure}{The default is "deviance", which uses the chosen loss function of the model. Other options include "mse" for mean squared error and "mae" for mean absolute error.}
-  \item{seed}{Seed for the random number generator in order to obtain reproducible results.}
+  \item{fold.id}{(Optional) a vector of values between 1 and nfold indicating 
+  which fold each observation belongs to. If supplied, nfolds can be missing. 
+  By default the observations are randomly assigned by \code{cv.hqreg}. }
+  \item{type.measure}{The default is "deviance", which uses the chosen loss function of the model. 
+  Other options include "mse" for mean squared error and "mae" for mean absolute error.}
+  \item{seed}{(Optional) Seed for the random number generator in order to obtain reproducible results.}
   \item{trace}{If set to TRUE, cv.hqreg will inform the user of its
     progress by announcing the beginning of each CV fold.  Default is
     FALSE.}
