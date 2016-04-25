@@ -59,6 +59,10 @@ y = drop(X[,1:10] \%*\% beta + eps)
 cv = cv.hqreg(X, y, seed = 123)
 plot(cv)
 predict(cv, X[1:5,])
+
+# parallel cross validation
+cv = cv.hqreg(X, y, ncores = 5)
+plot(cv)
 }
 \keyword{models}
 \keyword{regression}
