@@ -30,7 +30,6 @@ fit = hqreg(X, y)
 par(mfrow = c(2,2))
 plot(fit)
 plot(fit, nvars = FALSE, alpha = 0.5)
-plot(fit, log.x = TRUE)
 plot(fit, xvar = "norm")
 }
 \keyword{models}
