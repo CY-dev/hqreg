@@ -4,8 +4,8 @@
 \description{Perform k-fold cross validation for elastic-net penalized Huber loss regression 
   and quantile regression over a sequence of lambda values and find an optimal lambda.}
 \usage{
-cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, type.measure = c("deviance", "mse", "mae"), 
-         seed, trace = FALSE)
+cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, 
+        type.measure = c("deviance", "mse", "mae"), seed, trace = FALSE)
 }
 \arguments{
   \item{X}{The input matrix, as in \code{hqreg}.}
