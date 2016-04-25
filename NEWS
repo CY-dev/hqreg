@@ -15,4 +15,11 @@
 	* corrected typos in documentation
 
 1.2-2
-  * removed redundancy and reduced memory allocation in hqreg.c
+  	* removed redundancy and reduced memory allocation in hqreg.c
+
+1.2-3
+  	* changed log.x to log.l in plot functions
+
+1.2-4
+  	* cv.hqreg: added a new argument "ncores" for parallel computing
+
