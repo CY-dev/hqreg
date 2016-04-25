@@ -1,7 +1,6 @@
-plot.hqreg <- function(x, xvar = c("lambda", "norm"), log.x =FALSE, nvars = TRUE, alpha = 1, ...)
+plot.hqreg <- function(x, xvar = c("lambda", "norm"), log.l = TRUE, nvars = TRUE, alpha = 1, ...)
 {
   xvar <- match.arg(xvar)
-  if (xvar == "norm" && log.x == TRUE) stop("set log.x to be FALSE when plotting against the L1 norm")
   nonzero <- which(rowSums(abs(x$beta))!=0)
   Y <- x$beta[nonzero[-1],]
   p <- nrow(Y)
