@@ -4,11 +4,11 @@
 \description{Plot the cross-validation curve for a "cv.hqreg" object against the 
 \code{lambda} values used, along with standard error bars.}
 \usage{
-\method{plot}{cv.hqreg}(x, log.x = TRUE, nvars = TRUE, ...)
+\method{plot}{cv.hqreg}(x, log.l = TRUE, nvars = TRUE, ...)
 }
 \arguments{
   \item{x}{A \code{"cv.hqreg"} object.}
-  \item{log.x}{Should X-axis be on the log scale?  Default is TRUE.}
+  \item{log.l}{Should \code{log(lambda)} be used instead of \code{lambda} for X-axis? Default is TRUE.}
   \item{nvars}{If \code{TRUE} (the default), places an axis on top of the plot denoting 
     the number of variables with nonzero coefficients at each \code{lambda}.}
   \item{\dots}{Other graphical parameters to \code{plot}}
@@ -22,7 +22,7 @@ beta = rnorm(10)
 eps = 4*rnorm(1000)
 y = drop(X[,1:10] \%*\% beta + eps)
 cv = cv.hqreg(X, y, seed = 123)
-plot(cv, log.x = TRUE)
+plot(cv)
 }
 \keyword{models}
 \keyword{regression}
