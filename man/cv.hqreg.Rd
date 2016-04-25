@@ -14,8 +14,8 @@ cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, type.measure = c("deviance
   \item{ncores}{\code{cv.hqreg} can be run in parallel across a
   cluster using the \code{parallel} package. If \code{ncores > 1},a cluster is 
   created to run \code{cv.hqreg} in parallel. The code is run sequentially if 
-  \code{ncores = 1} (the default). An error occurs if \code{ncores} is larger than the
-  total number of available cores.}
+  \code{ncores = 1} (the default). A message is printed if \code{ncores} is larger than the
+  total number of available cores, and all available cores will be used.}
   \item{nfolds}{The number of cross-validation folds. Default is 10.}
   \item{fold.id}{(Optional) a vector of values between 1 and nfold indicating 
   which fold each observation belongs to. If supplied, nfolds can be missing. 
