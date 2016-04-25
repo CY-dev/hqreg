@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab hqreg\cr
 Type: \tab Package\cr
-Version: \tab 1.2-2\cr
-Date: \tab 2016-03-19\cr
+Version: \tab 1.2-3\cr
+Date: \tab 2016-04-24\cr
 License: \tab GPL-3\cr
 }
 Very simple to use. Accepts \code{X,y} data for regression models, and
@@ -27,14 +27,16 @@ y = drop(X[,1:10] \%*\% beta + eps)
 fit1 = hqreg(X, y)
 coef(fit1, 0.01)
 predict(fit1, X[1:5,], lambda = c(0.02, 0.01))
+cv.fit1 = cv.hqreg(X, y)
+plot(cv.fit1)
 
 # Quantile loss
 fit2 = hqreg(X, y, method = "quantile", tau = 0.2)
-plot(fit2, xvar = "norm")
+plot(fit2)
 
 # Squared loss
 fit3 = hqreg(X, y, method = "ls", preprocess = "rescale")
-plot(fit3, xvar = "lambda", log.x = TRUE)
+plot(fit3, xvar = "norm")
 }
 \keyword{models}
 \keyword{regression}
