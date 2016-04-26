@@ -399,7 +399,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   // Setup lambda
   if (user==0) {
     lambda[0] = maxprod(x, d, n, p, pf);
-    // compute lambda[0] for original quantile loss
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
         d[i] = 1.0+c;
@@ -408,7 +407,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       } 
     }
     temp = maxprod(x, d, n, p, pf);
-    if (temp>lambda[0]) lambda[0] = temp; // pick the larger one
+    if (temp>lambda[0]) lambda[0] = temp;
     lambda[0] = lambda[0]/(2*n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
@@ -416,8 +415,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   }
 
   // Solution path
-  for (l=0; l<nlam; l++) {
-    if (gamma>0.0001 && l>0) {
+  for (l=1; l<nlam; l++) {
+    if (gamma>0.0001) {
       temp = ksav(r, n, m);
       if (temp < gamma) gamma = temp;
     }
@@ -939,7 +938,6 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   // Setup lambda
   if (user==0) {
     lambda[0] = maxprod(x, d, n, p, pf);
-    // compute lambda[0] for original quantile loss
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
         d[i] = 1.0+c;
@@ -948,7 +946,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
       } 
     }
     temp = maxprod(x, d, n, p, pf);
-    if (temp>lambda[0]) lambda[0] = temp; // pick the larger one
+    if (temp>lambda[0]) lambda[0] = temp;
     lambda[0] = lambda[0]/(2*n*0.01);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
