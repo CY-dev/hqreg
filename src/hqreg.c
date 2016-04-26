@@ -206,7 +206,11 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         ldiff = lmax - lambda[0];
       }
       for (j=1; j<p; j++) {
-        if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
+        if(fabs(z[j]) > (cutoff * pf[j])) {
+          include[j] = 1;
+        } else {
+          include[j] = 0;
+        }
       }
       strfactor = 1.0; //reset strfactor for ASR
     }
@@ -226,14 +230,15 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         for (j=0; j<p; j++) {
           if (include[j]) {
             // Calculate v1, v2
-	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
+	    jn = j*n; v1 = 0.0; v2 = 0.0; //pct = 0.0;
             for (i=0; i<n; i++) {
               v1 += x[jn+i]*d1[i];
               v2 += x2[jn+i]*d2[i];
-              pct += d2[i];
+              //pct += d2[i];
             }
-	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
-	    if (pct < 0.05 || pct < 1.0/n) {
+	    v1 = v1/n; v2 = v2/n; //pct = pct*gamma/n;
+	    if (v2 < 0.01 && v2 < 1.0/n) {
+	    //if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
               v2 = 0.0; 
 	      for (i=0; i<n; i++) {
@@ -257,10 +262,10 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               beta[lp+j] = 0.0;
             }
             // mark the first mismatch between beta and s
-	    if (!mismatch && j>0) {
-              if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
-		 mismatch = 1;
-            }
+	    //if (!mismatch && j>0) {
+              //if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
+		 //mismatch = 1;
+            //}
 	    // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
             if (change!=0.0) {
@@ -285,7 +290,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         }
         // Check for convergence
         if (iter[l]>1) {
-          if (!mismatch && max_update < thresh) {
+          if (max_update < thresh) {
             converged = 1;
 	    break;
 	  }
