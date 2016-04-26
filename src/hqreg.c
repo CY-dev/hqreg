@@ -206,8 +206,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         ldiff = lmax - lambda[0];
       }
       for (j=1; j<p; j++) {
-        if (fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
-        else include[j] = 0;
+        if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
       strfactor = 1.0; //reset strfactor for ASR
     }
