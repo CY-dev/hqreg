@@ -15,13 +15,14 @@ static double sign(double x) {
 }
 
 static void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
+  double gi = 1.0/gamma;
   for (int i=0; i<n; i++)
     if (fabs(r[i]) > gamma) {
       d1[i] = sign(r[i]);
       d2[i] = 0.0;
     } else {
-      d1[i] = r[i]/gamma;
-      d2[i] = 1.0/gamma;
+      d1[i] = r[i]*gi;
+      d2[i] = 1.0*gi;
     }
 }
 
@@ -126,7 +127,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   double gamma = gamma_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged, mismatch; double pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
+  int i, j, k, l, lp, jn, converged, mismatch; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -206,11 +207,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         ldiff = lmax - lambda[0];
       }
       for (j=1; j<p; j++) {
-        if(fabs(z[j]) > (cutoff * pf[j])) {
-          include[j] = 1;
-        } else {
-          include[j] = 0;
-        }
+        if(include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
       strfactor = 1.0; //reset strfactor for ASR
     }
@@ -230,15 +227,14 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         for (j=0; j<p; j++) {
           if (include[j]) {
             // Calculate v1, v2
-	    jn = j*n; v1 = 0.0; v2 = 0.0; //pct = 0.0;
+	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
             for (i=0; i<n; i++) {
               v1 += x[jn+i]*d1[i];
               v2 += x2[jn+i]*d2[i];
-              //pct += d2[i];
+              pct += d2[i];
             }
-	    v1 = v1/n; v2 = v2/n; //pct = pct*gamma/n;
-	    if (v2 < 0.01 && v2 < 1.0/n) {
-	    //if (pct < 0.05 || pct < 1.0/n) {
+	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
+	    if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
               v2 = 0.0; 
 	      for (i=0; i<n; i++) {
@@ -262,10 +258,10 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               beta[lp+j] = 0.0;
             }
             // mark the first mismatch between beta and s
-	    //if (!mismatch && j>0) {
-              //if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
-		 //mismatch = 1;
-            //}
+	    if (!mismatch && j>0) {
+              if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
+		 mismatch = 1;
+            }
 	    // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
             if (change!=0.0) {
@@ -276,8 +272,8 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
                   d1[i] = sign(r[i]);
                   d2[i] = 0.0;
                 } else {
-		  d1[i] = r[i]/gamma;
-		  d2[i] = 1.0/gamma;
+		  d1[i] = r[i]*gi;
+		  d2[i] = 1.0*gi;
 	          v2 += x2[jn+i]*d2[i];
 	        }
 	      }
@@ -290,7 +286,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         }
         // Check for convergence
         if (iter[l]>1) {
-          if (max_update < thresh) {
+          if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
 	  }
