@@ -286,7 +286,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         }
         // Check for convergence
         if (iter[l]>1) {
-          if (!mismatch && max_update < thresh) {
+          if (max_update < thresh) {
             converged = 1;
 	    break;
 	  }
