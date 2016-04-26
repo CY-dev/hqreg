@@ -350,7 +350,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double gamma = gamma_[0]; double tau = tau_[0]; double c = 2*tau-1.0; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged, mismatch; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
+  int i, j, k, l, lp, jn, converged, mismatch; double gi, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -422,6 +422,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       if (temp < gamma) gamma = temp;
     }
     if (gamma<0.001) gamma = 0.001;
+    gi = 1.0/gamma;
     if (message) Rprintf("Lambda %d: Gamma = %f\n", l+1, gamma);
     converged = 0; lp = l*p;
     l1 = lambda[l]*alpha;
@@ -902,7 +903,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   double gamma = gamma_[0]; double tau = tau_[0]; double c = 2*tau-1.0; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged; double gi, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
@@ -961,6 +962,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
       if (temp < gamma) gamma = temp;
     }
     if (gamma<0.001) gamma = 0.001;
+    gi = 1.0/gamma;
     if (message) Rprintf("Lambda %d: Gamma = %f\n", l+1, gamma);
     converged = 0; lp = l*p;
     while(iter[l] < max_iter) {
