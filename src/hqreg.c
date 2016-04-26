@@ -230,11 +230,11 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
             for (i=0; i<n; i++) {
               v1 += x[jn+i]*d1[i];
               v2 += x2[jn+i]*d2[i];
-              pct += d2[i];
+              //pct += d2[i];
             }
-	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
+	    v1 = v1/n; v2 = v2/n; //pct = pct*gamma/n;
             //if (iter[l]==1 && j==1)Rprintf("l=%d, v1=%lf, v2=%lf, pct=%lf\n",l+1,v1,v2,pct);
-	    if (pct < 0.05 || pct < 1.0/n) {
+	    if (v2*gamma < 0.05 || v2*gamma < 1.0/n) {
 	      // approximate v2 with a continuation technique
               v2 = 0.0; 
 	      for (i=0; i<n; i++) {
@@ -286,7 +286,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         }
         // Check for convergence
         if (iter[l]>1) {
-          if (max_update < thresh) {
+          if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
 	  }
