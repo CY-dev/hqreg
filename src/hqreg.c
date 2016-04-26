@@ -27,13 +27,14 @@ static void derivative_huber(double *d1, double *d2, double *r, double gamma, in
 }
 
 static void derivative_quantapprox(double *d1, double *d2, double *r, double gamma, double c, int n) {
+  double gi = 1.0/gamma;
   for (int i=0; i<n; i++) {
     if (fabs(r[i]) > gamma) {
       d1[i] = sign(r[i]);
       d2[i] = 0.0;
     } else {
-      d1[i] = r[i]/gamma;
-      d2[i] = 1.0/gamma;
+      d1[i] = r[i]*gi;
+      d2[i] = 1.0*gi;
     }
     d1[i] += c;
   }
@@ -174,8 +175,8 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   }
   thresh = eps*nullDev;
   if (message) Rprintf("threshold = %f\n", thresh);
-  derivative_huber(d1, d2, r, gamma, n); 
- 
+  derivative_huber(d1, d2, r, gamma, n);
+  
   for (j=0; j<p; j++) {
     z[j] = crossprod(x, d1, n, j)/n;
   }
@@ -350,7 +351,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double gamma = gamma_[0]; double tau = tau_[0]; double c = 2*tau-1.0; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged, mismatch; double pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
+  int i, j, k, l, lp, jn, converged, mismatch; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -507,8 +508,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                   d1[i] = sign(r[i])+c;
                   d2[i] = 0.0;
                 } else {
-		  d1[i] = r[i]/gamma+c;
-		  d2[i] = 1.0/gamma;
+		  d1[i] = r[i]*gi+c;
+		  d2[i] = 1.0*gi;
 	          //v2 += x2[jn+i]*d2[i];
 	        }
 	      }
@@ -773,7 +774,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   double gamma = gamma_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged; double pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
@@ -863,8 +864,8 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
               d1[i] = sign(r[i]);
               d2[i] = 0.0;
             } else {
-	      d1[i] = r[i]/gamma;
-              d2[i] = 1.0/gamma;
+	      d1[i] = r[i]*gi;
+              d2[i] = 1.0*gi;
 	      v2 += x2[jn+i]*d2[i];
 	    }
 	  }
@@ -902,7 +903,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   double gamma = gamma_[0]; double tau = tau_[0]; double c = 2*tau-1.0; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged; double pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
@@ -1005,8 +1006,8 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
               d1[i] = sign(r[i])+c;
               d2[i] = 0.0;
             } else {
-	      d1[i] = r[i]/gamma+c;
-              d2[i] = 1.0/gamma;
+	      d1[i] = r[i]*gi+c;
+              d2[i] = 1.0*gi;
 	    }
 	  }
           update = n*(v2*change*change + 2*fabs(v1*change));
