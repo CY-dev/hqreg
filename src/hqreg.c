@@ -234,7 +234,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
             }
 	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
             //if (iter[l]==1 && j==1)Rprintf("l=%d, v1=%lf, v2=%lf, pct=%lf\n",l+1,v1,v2,pct);
-	    if (pct<0.05 || pct<1.0/n) {
+	    if (pct<0.03 || pct<1.0/n) {
 	      // approximate v2 with a continuation technique
               v2 = 0.0; 
 	      for (i=0; i<n; i++) {
@@ -468,7 +468,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               pct += d2[i];
             }
 	    v1 = v1/(2*n); v2 = v2/(2*n); pct = pct*gamma/n;
-	    if (pct<0.05 || pct<1.0/n) {
+	    if (pct<0.03 || pct<1.0/n) {
 	      // Rprintf("j=%d, pct=%lf\n",j,pct);
 	      // approximate v2 with a continuation technique
               v2 = 0.0;
@@ -833,7 +833,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
           pct += d2[i];
         }
 	v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
-	if (pct<0.05 || pct<1/n) {
+	if (pct<0.03 || pct<1.0/n) {
           //Rprintf("j=%d, pct=%lf\n",j,pct);
 	  // approximate v2 with a continuation technique
           v2 = 0.0; 
@@ -975,7 +975,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
           pct += d2[i];
         }
 	v1 = v1/(2*n); v2 = v2/(2*n); pct = pct*gamma/n;
-	if (pct<0.05 || pct<1/n) {
+	if (pct<0.03 || pct<1.0/n) {
 	  // Rprintf("j=%d, pct=%lf\n",j,pct);
 	  // approximate v2 with a continuation technique
           v2 = 0.0;
