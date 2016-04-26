@@ -1,6 +1,6 @@
 hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5, alpha=1, nlambda=100, lambda.min = 0.05, lambda, 
-		  preprocess = c("standardize", "rescale", "none"),  screen = c("ASR", "SR", "none"), max.iter = 10000, eps = 1e-7, 
-		  dfmax = ncol(X)+1, penalty.factor=rep(1, ncol(X)), message = FALSE) {
+                   preprocess = c("standardize", "rescale", "none"),  screen = c("ASR", "SR", "none"), max.iter = 10000, eps = 1e-7, 
+                   dfmax = ncol(X)+1, penalty.factor=rep(1, ncol(X)), message = FALSE) {
   
   # Error checking
   method <- match.arg(method)
@@ -11,19 +11,24 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
   if (method == "huber" && !missing(gamma) && gamma <= 0) stop("gamma should be positive for Huber loss")
   if (method == "quantile" && (tau < 0 || tau > 1)) stop("tau should be between 0 and 1 for quantile loss")
   if (length(penalty.factor)!=ncol(X)) stop("the length of penalty.factor should equal the number of columns of X")
-
+  
   call <- match.call()
   # Include a column for intercept
   n <- nrow(X)
   XX <- cbind(rep(1,n), X)
   penalty.factor <- c(0, penalty.factor) # no penalty for intercept term
   p <- ncol(XX)
-
+  
   shift <- 0
   if (method == "huber") {
-    shift <- mean(y)
-    yy <- y-shift
-    if(missing(gamma)) gamma <- quantile(abs(yy), 0.05)
+    if(missing(gamma)) {
+      shift <- mean(y)
+      yy <- y-shift
+      gamma <- quantile(abs(yy), 0.1)
+    } else {
+      shift <- if(gamma > sd(y)*2) mean(y) else median(y)
+      yy <- y-shift
+    }
   } else if (method == "ls") {
     shift <- mean(y)
     yy <- y-shift
@@ -32,12 +37,12 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
     yy <- y-shift
     # initialize gamma to determine lambda sequence
     gamma <- quantile(abs(yy), 0.05)
-    if (gamma < 0.00001) gamma = 0.00001
+    if (gamma < 1e-6) gamma = 1e-6
   }
-
+  
   # Constant for quantile loss
   c <- 2*tau-1
-
+  
   # Setup vector d for generating the lambda sequence
   d <- 0
   user <- 0
@@ -97,7 +102,7 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
     saturated <- 0
     nv <- 0
   }
- 
+  
   # Intercept
   beta[1,] <- beta[1,] + shift
   
@@ -106,7 +111,7 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
   if (is.null(vnames)) vnames=paste0("V",seq(p-1))
   vnames <- c("(Intercept)", vnames)
   dimnames(beta) <- list(vnames, round(lambda, 4))
-
+  
   # Output
   structure(list(call = call,
                  beta = beta,
