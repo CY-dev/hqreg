@@ -6,10 +6,12 @@
 #include "Rinternals.h"
 #include "R_ext/Rdynload.h"
 
+double sign(double x);
+
 // Fit the initial solutions for unpenalized features in elastic-net penalized models
 void init_huber(double *beta, double *beta_old, double *x, double *x2, double *y, double *r, double *pf, 
 		double *d1, double *d2, double gamma, double gi, double thresh, int max_iter, int n, int p) {
-  double v1, v2, pct; int i, j, jn;
+  double v1, v2, pct, change, max_update, update; int i, j, jn;
   for (j=0; j<p; j++) {
     if (pf[j] == 0.0) { // unpenalized
       // Calculate v1, v2
