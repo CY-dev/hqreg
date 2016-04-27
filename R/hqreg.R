@@ -26,7 +26,7 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
       yy <- y-shift
       gamma <- quantile(abs(yy), 0.1)
     } else {
-      shift <- if(gamma > sd(y)*2) mean(y) else median(y)
+      shift <- if(gamma > sd(y)) mean(y) else median(y)
       yy <- y-shift
     }
   } else if (method == "ls") {
