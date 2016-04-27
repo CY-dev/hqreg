@@ -6,6 +6,9 @@
 #include "Rinternals.h"
 #include "R_ext/Rdynload.h"
 
+double sign(double x);
+double crossprod(double *x, double *v, int n, int j);
+double maxprod(double *x, double *v, int n, int p, double *pf);
 double ksav(double *a, int size, int K);
 void standardize(double *x, double *x2, double *shift, double *scale, int n, int p);
 void rescale(double *x, double *x2, double *shift, double *scale, int n, int p);
@@ -19,12 +22,6 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
 void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2, 
 		  double x2bar, double *y, double *r, double *pf, double thresh, int n, 
                   int p, int ppflag, int max_iter);
-
-double sign(double x) {
-  if (x > 0.0) return 1.0;
-  else if (x < 0.0) return -1.0;
-  else return 0.0;
-}
 
 void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
   double gi = 1.0/gamma;
@@ -50,25 +47,6 @@ void derivative_quantapprox(double *d1, double *d2, double *r, double gamma, dou
     }
     d1[i] += c;
   }
-}
-
-double crossprod(double *x, double *v, int n, int j) {
-  int jn = j*n, i;
-  double sum=0.0;
-  for (i=0;i<n;i++) sum += x[jn+i]*v[i];
-  return(sum);
-}
-
-double maxprod(double *x, double *v, int n, int p, double *pf) {
-  int j;
-  double z, max=0.0;
-  for (j=1; j<p; j++) {
-    if (pf[j]) {
-      z = fabs(crossprod(x, v, n, j))/pf[j];
-      if (z>max) max = z;
-    }
-  }
-  return(max);
 }
 
 // Semismooth Newton Coordinate Descent (SNCD)
