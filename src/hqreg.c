@@ -120,8 +120,10 @@ static void postprocess(double *beta, double *shift, double *scale, int nlam, in
   }
 }
 
+
+
 // Semismooth Newton Coordinate Descent (SNCD)
-static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *d, double *pf, double *gamma_, double *alpha_, double *eps_, double *lambda_min_, 
+static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *gamma_, double *alpha_, double *eps_, double *lambda_min_, 
 	int *nlam_, int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
@@ -343,7 +345,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   Free(include);
 }
 
-static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *d, double *pf, double *gamma_, double *tau_, double *alpha_, double *eps_, 
+static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *gamma_, double *tau_, double *alpha_, double *eps_, 
        double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
@@ -579,7 +581,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   Free(include);
 }
 
-static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *d, double *pf, double *alpha_, double *eps_, double *lambda_min_, 
+static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *alpha_, double *eps_, double *lambda_min_, 
 	int *nlam_, int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
@@ -766,7 +768,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 }
 
 // alpha = 0, pure l2 penalty
-static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *d, double *pf, double *gamma_, double *eps_, double *lambda_min_, 
+static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *gamma_, double *eps_, double *lambda_min_, 
 	int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
@@ -895,7 +897,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   Free(d2);
 }
 
-static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *d, double *pf, double *gamma_, double *tau_, double *eps_, 
+static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *gamma_, double *tau_, double *eps_, 
        double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
@@ -1035,7 +1037,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   Free(d2);
 }
 
-static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *d, double *pf, double *eps_, double *lambda_min_, 
+static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *eps_, double *lambda_min_, 
 	int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
@@ -1133,12 +1135,12 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
 
 
 static const R_CMethodDef cMethods[] = {
-  {"huber", (DL_FUNC) &sncd_huber, 22},
-  {"quant", (DL_FUNC) &sncd_quantile, 23},
-  {"squared", (DL_FUNC) &sncd_squared, 21},
-  {"huber_l2", (DL_FUNC) &sncd_huber_l2, 17},
-  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 18},
-  {"squared_l2", (DL_FUNC) &sncd_squared_l2, 16},
+  {"huber", (DL_FUNC) &sncd_huber, 21},
+  {"quant", (DL_FUNC) &sncd_quantile, 22},
+  {"squared", (DL_FUNC) &sncd_squared, 20},
+  {"huber_l2", (DL_FUNC) &sncd_huber_l2, 16},
+  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 17},
+  {"squared_l2", (DL_FUNC) &sncd_squared_l2, 15},
   {NULL}
 };
 
