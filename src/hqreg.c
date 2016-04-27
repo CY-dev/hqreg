@@ -11,8 +11,14 @@ void standardize(double *x, double *x2, double *shift, double *scale, int n, int
 void rescale(double *x, double *x2, double *shift, double *scale, int n, int p);
 void postprocess(double *beta, double *shift, double *scale, int nlam, int p);
 void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2, 
-		double *y, double *r, double *pf, double *d1, double *d2, double gamma, 
-		double gi, double thresh, int n, int p, int max_iter);
+		double *y, double *r, double *pf, double *d1, double *d2, double gamma,
+		double thresh, int n, int p, int max_iter);
+void init_quantile(double *beta, double *beta_old, int *iter, double *x, double *x2, 
+		   double *y, double *r, double *pf, double *d1, double *d2, double gamma,
+		   double c, double thresh, int n, int p, int max_iter);
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2, 
+		  double x2bar, double *y, double *r, double *pf, double thresh, int n, 
+                  int p, int ppflag, int max_iter);
 
 double sign(double x) {
   if (x > 0.0) return 1.0;
@@ -74,10 +80,10 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   double gamma = gamma_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  double pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   int i, j, k, l, lp, jn, converged, mismatch; 
+  double pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double gi = 1.0/gamma; // 1/gamma as a multiplier
-  double strfactor = 1.0; // scaling factor used for screening rule
+  double scrfactor = 1.0; // scaling factor used for screening rule
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -91,11 +97,12 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   double *z = Calloc(p, double); // partial derivative used for screening: X^t*d1/n
   double cutoff;
   int *include = Calloc(p, int); 
-  include[0] = 1; // intercept is unpenalized so always included
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
-  // ASR fits an appropriate strfactor adaptively; SR always uses strfactor = 1
+  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   if (scrflag == 0) {
-    for (j=1; j<p; j++) include[j] = 1;
+    for (j=0; j<p; j++) include[j] = 1;
+  } else {
+    for (j=0; j<p; j++) if(pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
   }
   int violations = 0, nv = 0; 
   
@@ -125,41 +132,34 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   thresh = eps*nullDev;
   if (message) Rprintf("threshold = %f\n", thresh);
   derivative_huber(d1, d2, r, gamma, n);
-  
-  for (j=0; j<p; j++) {
-    z[j] = crossprod(x, d1, n, j)/n;
-  }
 
-  // Setup lambda
+  // Find initial solutions for lambda[0]
+  init_huber(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, thresh, n, p, max_iter);
+
+  // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d, n, p, pf)/(n*alpha);
+    lambda[0] = maxprod(x, d1, n, p, pf)/(n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
   }
 
+  for (j=0; j<p; j++) z[j] = crossprod(x, d1, n, j)/n;
+
   // Solution path
-  for (l=0; l<nlam; l++) {
+  for (l=1; l<nlam; l++) {
     converged = 0; lp = l*p;
     l1 = lambda[l]*alpha;
     l2 = lambda[l]*(1.0-alpha);
     // Variable screening
     if (scrflag != 0) {
-      if (strfactor>5.0) strfactor = 5.0;
-      if (l != 0) {
-        cutoff = alpha*((1.0+strfactor)*lambda[l] - strfactor*lambda[l-1]);
-        ldiff = lambda[l-1] - lambda[l];
-      } else {
-        lmax = 0.0;
-        for (j=0; j<p; j++) if (fabs(z[j])>lmax) lmax = fabs(z[j]);
-        lmax = lmax/alpha;
-        cutoff = alpha*((1+strfactor)*lambda[0] - strfactor*lmax);
-        ldiff = lmax - lambda[0];
-      }
+      if (scrfactor>5.0) scrfactor = 5.0;
+      cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
+      ldiff = lambda[l-1] - lambda[l];
       for (j=1; j<p; j++) {
         if(include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      strfactor = 1.0; //reset strfactor for ASR
+      scrfactor = 1.0; //reset scrfactor
     }
     while(iter[l] < max_iter) {
       converged = 0;
@@ -208,14 +208,14 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               beta[lp+j] = 0.0;
             }
             // mark the first mismatch between beta and s
-	    if (!mismatch && j>0) {
+	    if (!mismatch && pf[j] > 0) {
               if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
 		 mismatch = 1;
             }
 	    // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
             if (fabs(change) > 1e-6) {
-	      v2 = 0.0;
+	      //v2 = 0.0;
               for (i=0; i<n; i++) {
 		r[i] -= x[jn+i]*change;
                 if (fabs(r[i])>gamma) {
@@ -224,11 +224,11 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
                 } else {
 		  d1[i] = r[i]*gi;
 		  d2[i] = gi;
-	          v2 += x2[jn+i]*d2[i];
+	          //v2 += x2[jn+i]*d2[i];
 	        }
 	      }
-	      v2 += n*l2*pf[j];
-	      update = v2*change*change;
+	      //v2 += n*l2*pf[j];
+	      update = (v2+l2*pf[j])*change*change*n;
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
@@ -259,7 +259,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1 && ldiff != 0) {
 	      v3 = fabs((v1-z[j])/(pf[j]*ldiff*alpha));
-              if (v3 > strfactor) strfactor = v3;
+              if (v3 > scrfactor) scrfactor = v3;
 	    }
 	    z[j] = v1;
 	  } else if (beta_old[j] != 0) nnzero++;
@@ -292,14 +292,18 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   Free(include);
 }
 
-static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *gamma_, double *tau_, double *alpha_, double *eps_, 
-       double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
+static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
+			  double *pf, double *tau_, double *alpha_, double *eps_, double *lambda_min_, int *nlam_, 
+			  int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
-  double gamma = gamma_[0]; double tau = tau_[0]; double c = 2*tau-1.0; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
+  double tau = tau_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged, mismatch; double gi, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
+  int i, j, k, l, lp, jn, converged, mismatch; 
+  double gamma, gi, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh; 
+  double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
+  double scrfactor = 1.0; // variable screening factor
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -308,16 +312,18 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double *beta_old = Calloc(p, double);
   double *r = Calloc(n, double);
   double *s = Calloc(p, double);
+  double *d = Calloc(n, double);
   double *d1 = Calloc(n, double);
   double *d2 = Calloc(n, double);
   double *z = Calloc(p, double); // partial derivative used for screening: X^t*d1/n
   double cutoff;
   int *include = Calloc(p, int);
-  include[0] = 1; // intercept is unpenalized so always included
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
-  // ASR fits an appropriate strfactor adaptively; SR always uses strfactor = 1
+  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   if (scrflag == 0) {
-    for (j=1; j<p; j++) include[j] = 1;
+    for (j=0; j<p; j++) include[j] = 1;
+  } else {
+    for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
   }
   int violations = 0, nv = 0;
   int m = (int) (n*0.10);
@@ -338,22 +344,25 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   nullDev = 0.0; // not divided by n
   for (i=0;i<n;i++) {
     r[i] = y[i];
-    temp = r[i];
-    nullDev += fabs(temp) + c*temp;
+    nullDev += fabs(r[i]) + c*r[i];
   }
   thresh = eps*nullDev;
+  gamma = ksav(r, n, m);
+  if (gamma<0.0001) gamma = 0.0001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
-  for (j=0; j<p; j++) z[j] = crossprod(x, d1, n, j)/(2*n);
 
-  // Setup lambda
+  // Find initial solutions for lambda[0]
+  init_quantile(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, c, thresh, n, p, max_iter);
+
+  // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d, n, p, pf);
+    lambda[0] = maxprod(x, d1, n, p, pf);
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
-        d[i] = 1.0+c;
+        d[i] = c;
       } else {
         d[i] = sign(r[i])+c;
-      } 
+      }
     }
     temp = maxprod(x, d, n, p, pf);
     if (temp>lambda[0]) lambda[0] = temp;
@@ -362,6 +371,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
   }
+
+  for (j=0; j<p; j++) z[j] = crossprod(x, d1, n, j)/(2*n);
 
   // Solution path
   for (l=1; l<nlam; l++) {
@@ -377,21 +388,13 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     l2 = lambda[l]*(1.0-alpha);
     // Variable screening
     if (scrflag != 0) {
-      if (strfactor>5.0) strfactor = 5.0;
-      if (l != 0) {
-        cutoff = alpha*((1.0+strfactor)*lambda[l] - strfactor*lambda[l-1]);
-        ldiff = lambda[l-1] - lambda[l];
-      } else {
-        lmax = 0.0;
-        for (j=0; j<p; j++) if (fabs(z[j])>lmax) lmax = fabs(z[j]);
-        lmax = lmax/alpha;
-        cutoff = alpha*((1+strfactor)*lambda[0] - strfactor*lmax);
-        ldiff = lmax - lambda[0];
-      }
+      if (scrfactor>5.0) scrfactor = 5.0;
+      cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
+      ldiff = lambda[l-1] - lambda[l];
       for (j=1; j<p; j++) {
         if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      strfactor = 1.0; //reset strfactor for ASR
+      scrfactor = 1.0; //reset scrfactor
     }
     
     while(iter[l] < max_iter) {
@@ -442,14 +445,14 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               beta[lp+j] = 0.0;
             }
             // mark the first mismatch between beta and s
-	    if (!mismatch && j>0) {
+	    if (!mismatch && pf[j] > 0) {
               if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
 		 mismatch = 1;
             }
 	    // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
             if (fabs(change) > 1e-6) {
-	      v2 = 0.0;
+	      //v2 = 0.0;
               for (i=0; i<n; i++) {
 		r[i] -= x[jn+i]*change;
                 if (fabs(r[i])>gamma) {
@@ -463,7 +466,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	      }
 	      //v2 += 2*n*l2*pf[j];
 	      //update = v2*change*change;
-              //Rprintf("loss decrease = %f, penalty decrease = %f\n", v2*change*change, 2*n*l1*pf[j]*fabs(fabs(beta[lp+j])-fabs(beta_old[j])));
               update = n*(v2*change*change + 2*fabs(v1*change));
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
@@ -494,7 +496,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1 && ldiff != 0) {
 	      v3 = fabs((v1-z[j])/(pf[j]*ldiff*alpha));
-              if (v3 > strfactor) strfactor = v3;
+              if (v3 > scrfactor) scrfactor = v3;
 	    }
 	    z[j] = v1;
 	  }
@@ -522,20 +524,23 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   Free(beta_old);
   Free(r);
   Free(s);
+  Free(d);
   Free(d1);
   Free(d2);
   Free(z);
   Free(include);
 }
 
-static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *alpha_, double *eps_, double *lambda_min_, 
-	int *nlam_, int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
+static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
+			 double *pf, double *alpha_, double *eps_, double *lambda_min_, int *nlam_, int *n_, int *p_, 
+			 int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged, mismatch; double lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0;
+  int i, j, k, l, lp, jn, converged, mismatch; 
+  double lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, scrfactor = 1.0;
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -549,11 +554,12 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   double *z = Calloc(p, double); // X^t * r/n
   double cutoff;
   int *include = Calloc(p, int);
-  include[0] = 1; // intercept is unpenalized so always included
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
-  // ASR fits an appropriate strfactor adaptively; SR always uses strfactor = 1
+  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   if (scrflag == 0) {
-    for (j=1; j<p; j++) include[j] = 1;
+    for (j=0; j<p; j++) include[j] = 1;
+  } else {
+    for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
   }
   int violations = 0, nv = 0;
 
@@ -576,44 +582,40 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     nullDev += pow(r[i],2); // without dividing by 2n
   }
   thresh = eps*nullDev;
+
   for (j=0; j<p; j++) {
-    z[j] = crossprod(x, r, n, j)/n;
     jn = j*n;
-    for (i=0; i<n; i++) x2bar[j] += x2[jn+i];
-    x2bar[j] = x2bar[j]/n;
+    temp = 0.0;
+    for (i=0; i<n; i++) temp += x2[jn+i];
+    x2bar[j] = temp/n;
   }
+
+  // Find initial solutions for lambda[0]
+  init_squared(beta, beta_old, iter, x, x2bar, y, r, pf, thresh, n, p, ppflag, max_iter);
   
-  // Setup lambda
+  // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d, n, p, pf)/(n*alpha);
+    lambda[0] = maxprod(x, r, n, p, pf)/(n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
   }
 
   // Solution path
-  for (l=0; l<nlam; l++) {
+  for (l=1; l<nlam; l++) {
     converged = 0; lp = l*p;
     l1 = lambda[l]*alpha;
     l2 = lambda[l]*(1.0-alpha);
 
     // Variable screening
     if (scrflag != 0) {
-      if (strfactor>5.0) strfactor = 5.0;
-      if (l != 0) {
-        cutoff = alpha*((1.0+strfactor)*lambda[l] - strfactor*lambda[l-1]);
-        ldiff = lambda[l-1] - lambda[l];
-      } else {
-        lmax = 0.0;
-        for (j=0; j<p; j++) if (fabs(z[j])>lmax) lmax = fabs(z[j]);
-        lmax = lmax/alpha;
-        cutoff = alpha*((1+strfactor)*lambda[0] - strfactor*lmax);
-        ldiff = lmax - lambda[0];
-      }
+      if (scrfactor>5.0) scrfactor = 5.0;
+      cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
+      ldiff = lambda[l-1] - lambda[l];
       for (j=1; j<p; j++) {
         if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      strfactor = 1.0; //reset strfactor for ASR
+      scrfactor = 1.0; //reset scrfactor
     }
     while(iter[l] < max_iter) {
       converged = 0;
@@ -643,16 +645,16 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
               beta[lp+j] = 0.0;
             }
             // mark the first mismatch between beta and s
-	    if (!mismatch && j>0) {
+	    if (!mismatch && pf[j] > 0) {
               if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
 		 mismatch = 1;
             }
 	    // Update residuals
             change = beta[lp+j]-beta_old[j];       
             if (fabs(change) > 1e-6) {
-	      jn = j*n;              
+	      jn = j*n;
               for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
-	      update = n*(1.0+l2*pf[j])*change*change;
+	      update = (v2+l2*pf[j])*change*change*n;
 	      if (update>max_update) max_update = update;
 	      beta_old[j] = beta[lp+j];
             }
@@ -683,7 +685,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1 && ldiff != 0) {
 	      v3 = fabs((v1-z[j])/(pf[j]*ldiff*alpha));
-              if (v3 > strfactor) strfactor = v3;
+              if (v3 > scrfactor) scrfactor = v3;
 	    }
 	    z[j] = v1;
 	  }
@@ -715,14 +717,15 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 }
 
 // alpha = 0, pure l2 penalty
-static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *gamma_, double *eps_, double *lambda_min_, 
-	int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
+static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *gamma_, double *eps_, 
+			  double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double gamma = gamma_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged; 
+  double gi = 1.0/gamma, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
@@ -759,9 +762,9 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   //if (message) Rprintf("threshold = %f\n", thresh);
   derivative_huber(d1, d2, r, gamma, n); 
 
-  // Setup lambda
+  // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d, n, p, pf)/(n*0.01);
+    lambda[0] = maxprod(x, d1, n, p, pf)/n;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -805,7 +808,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
 	// Update r, d1, d2 and compute candidate of max_update
         change = beta[lp+j]-beta_old[j];
         if (fabs(change) > 1e-6) {
-	  v2 = 0.0;
+	  //v2 = 0.0;
           for (i=0; i<n; i++) {
 	    r[i] -= x[jn+i]*change;
             if (fabs(r[i])>gamma) {
@@ -814,11 +817,11 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
             } else {
 	      d1[i] = r[i]*gi;
               d2[i] = gi;
-	      v2 += x2[jn+i]*d2[i];
+	      //v2 += x2[jn+i]*d2[i];
 	    }
 	  }
-	  v2 += n*lambda[l]*pf[j];
-	  update = v2*change*change;
+	  //v2 += n*lambda[l]*pf[j];
+	  update = (v2+lambda[l]*pf[j])*change*change*n;
           if (update>max_update) max_update = update;
           beta_old[j] = beta[lp+j];
         }
@@ -844,20 +847,24 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   Free(d2);
 }
 
-static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *gamma_, double *tau_, double *eps_, 
-       double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
+static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
+			     double *tau_, double *eps_, double *lambda_min_, int *nlam_, int *n_, int *p_, 
+			     int *ppflag_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
-  double gamma = gamma_[0]; double tau = tau_[0]; double c = 2*tau-1.0; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
+  double tau = tau_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged; double gi, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged; 
+  double gamma, gi, pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
   double *r = Calloc(n, double);
+  double *d = Calloc(n, double);
   double *d1 = Calloc(n, double);
   double *d2 = Calloc(n, double);
   int m = (int) (n*0.10);
@@ -878,25 +885,24 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   nullDev = 0.0; // not divided by n
   for (i=0;i<n;i++) {
     r[i] = y[i];
-    temp = r[i];
-    nullDev += fabs(temp) + c*temp;
+    nullDev += fabs(r[i]) + c*r[i];
   }
   thresh = eps*nullDev;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
 
-  // Setup lambda
+  // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d, n, p, pf);
+    lambda[0] = maxprod(x, d1, n, p, pf);
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
-        d[i] = 1.0+c;
+        d[i] = c;
       } else {
         d[i] = sign(r[i])+c;
       } 
     }
     temp = maxprod(x, d, n, p, pf);
     if (temp>lambda[0]) lambda[0] = temp;
-    lambda[0] = lambda[0]/(2*n*0.01);
+    lambda[0] = lambda[0]/(2*n);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -947,7 +953,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
 	// Update r, d1, d2 and compute candidate of max_update
         change = beta[lp+j]-beta_old[j];
         if (fabs(change) > 1e-6) {
-	  v2 = 0.0;
+	  //v2 = 0.0;
           for (i=0; i<n; i++) {
 	    r[i] -= x[jn+i]*change;
             if (fabs(r[i])>gamma) {
@@ -980,18 +986,21 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   Free(scale);
   Free(beta_old);
   Free(r);
+  Free(d);
   Free(d1);
   Free(d2);
 }
 
-static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *eps_, double *lambda_min_, 
-	int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
+static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
+			    double *eps_, double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, 
+                            int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged; double pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged; 
+  double pct, lstep, ldiff, lmax, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *x2bar = Calloc(p, double); // Col Mean of x2
@@ -1021,14 +1030,14 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   }
   thresh = eps*nullDev;
   for (j=0; j<p; j++) {
-    jn = j*n;
-    for (i=0; i<n; i++) x2bar[j] += x2[jn+i];
-    x2bar[j] = x2bar[j]/n;
+    jn = j*n; temp = 0.0;
+    for (i=0; i<n; i++) temp += x2[jn+i];
+    x2bar[j] = temp/n;
   }
 
-  // Setup lambda
+  // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d, n, p, pf)/(n*0.01);
+    lambda[0] = maxprod(x, r, n, p, pf)/n;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -1055,7 +1064,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
         if (fabs(change) > 1e-6) {
 	  jn = j*n;              
           for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
-	  update = n*(1.0+lambda[l]*pf[j])*change*change;
+	  update = n*(v2+lambda[l]*pf[j])*change*change;
 	  if (update>max_update) max_update = update;
 	  beta_old[j] = beta[lp+j];
         }
@@ -1083,10 +1092,10 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
 
 static const R_CMethodDef cMethods[] = {
   {"huber", (DL_FUNC) &sncd_huber, 21},
-  {"quant", (DL_FUNC) &sncd_quantile, 22},
+  {"quant", (DL_FUNC) &sncd_quantile, 21},
   {"squared", (DL_FUNC) &sncd_squared, 20},
   {"huber_l2", (DL_FUNC) &sncd_huber_l2, 16},
-  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 17},
+  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 16},
   {"squared_l2", (DL_FUNC) &sncd_squared_l2, 15},
   {NULL}
 };
