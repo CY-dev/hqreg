@@ -7,14 +7,19 @@
 #include "R_ext/Rdynload.h"
 
 double ksav(double *a, int size, int K);
+void standardize(double *x, double *x2, double *shift, double *scale, int n, int p);
+void rescale(double *x, double *x2, double *shift, double *scale, int n, int p);
+void postprocess(double *beta, double *shift, double *scale, int nlam, int p);
+void init_huber(double *beta, double *beta_old, double *x, double *x2, double *y, double *r, double *pf, 
+		double *d1, double *d2, double gamma, double gi, double thresh, int max_iter, int n, int p);
 
-static double sign(double x) {
+double sign(double x) {
   if (x > 0.0) return 1.0;
   else if (x < 0.0) return -1.0;
   else return 0.0;
 }
 
-static void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
+void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
   double gi = 1.0/gamma;
   for (int i=0; i<n; i++)
     if (fabs(r[i]) > gamma) {
@@ -26,7 +31,7 @@ static void derivative_huber(double *d1, double *d2, double *r, double gamma, in
     }
 }
 
-static void derivative_quantapprox(double *d1, double *d2, double *r, double gamma, double c, int n) {
+void derivative_quantapprox(double *d1, double *d2, double *r, double gamma, double c, int n) {
   double gi = 1.0/gamma;
   for (int i=0; i<n; i++) {
     if (fabs(r[i]) > gamma) {
@@ -40,14 +45,14 @@ static void derivative_quantapprox(double *d1, double *d2, double *r, double gam
   }
 }
 
-static double crossprod(double *x, double *v, int n, int j) {
+double crossprod(double *x, double *v, int n, int j) {
   int jn = j*n, i;
   double sum=0.0;
   for (i=0;i<n;i++) sum += x[jn+i]*v[i];
   return(sum);
 }
 
-static double maxprod(double *x, double *v, int n, int p, double *pf) {
+double maxprod(double *x, double *v, int n, int p, double *pf) {
   int j;
   double z, max=0.0;
   for (j=1; j<p; j++) {
@@ -58,69 +63,6 @@ static double maxprod(double *x, double *v, int n, int p, double *pf) {
   }
   return(max);
 }
-
-// standardization for feature matrix
-static void standardize(double *x, double *x2, double *shift, double *scale, int n, int p) 
-{
-  int i, j, jn; double xm, xsd, xvar;
-  for (j=1; j<p; j++) {
-    jn = j*n; xm = 0.0; xsd = 0.0; xvar = 0.0; 
-    for (i=0; i<n; i++) xm += x[jn+i];
-    xm /= n;
-    for (i=0; i<n; i++) {
-      x[jn+i] -= xm;
-      x2[jn+i] = pow(x[jn+i], 2);
-      xvar += x2[jn+i];
-    }
-    xvar /= n;
-    xsd = sqrt(xvar);
-    for (i=0; i<n; i++) {
-      x[jn+i] = x[jn+i]/xsd;
-      x2[jn+i] = x2[jn+i]/xvar;
-    }
-    shift[j] = xm;
-    scale[j] = xsd;
-  }
-} 
-
-// rescaling for feature matrix
-static void rescale(double *x, double *x2, double *shift, double *scale, int n, int p) 
-{
-  int i, j, jn; double cmin, cmax, crange;
-  for (j=1; j<p; j++) {
-    jn = j*n; cmin = x[jn]; cmax = x[jn];
-    for (i=1; i<n; i++) {
-      if (x[jn+i] < cmin) {
-        cmin = x[jn+i];
-      } else if (x[jn+i] > cmax) {
-        cmax = x[jn+i];
-      }
-    }
-    crange = cmax - cmin;
-    for (i=0; i<n; i++) {
-      x[jn+i] = (x[jn+i]-cmin)/crange;
-      x2[jn+i] = pow(x[jn+i], 2);
-    }
-    shift[j] = cmin;
-    scale[j] = crange;
-  }
-}
-
-// postprocess feature coefficients
-static void postprocess(double *beta, double *shift, double *scale, int nlam, int p) {
-  int l, j, lp; double prod;
-  for (l = 0; l<nlam; l++) {
-    lp = l*p;
-    prod = 0.0;
-    for (j = 1; j<p; j++) {
-      beta[lp+j] = beta[lp+j]/scale[j];
-      prod += shift[j]*beta[lp+j];
-    }
-    beta[lp] -= prod;
-  }
-}
-
-
 
 // Semismooth Newton Coordinate Descent (SNCD)
 static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *gamma_, double *alpha_, double *eps_, double *lambda_min_, 
