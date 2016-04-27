@@ -163,7 +163,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
 	    if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
-              v2 = 0.0;
+              v2 = 0.0; 
 	      for (i=0; i<n; i++) {
 		if (d2[i]) {
 		  v2 += x2[jn+i]*d2[i];
@@ -1081,4 +1081,3 @@ void R_init_hqreg(DllInfo *info)
 {
   R_registerRoutines(info,cMethods,NULL,NULL,NULL);
 }
-
