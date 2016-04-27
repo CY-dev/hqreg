@@ -1,4 +1,10 @@
-
+#include <math.h>
+#include <time.h>
+#include <string.h>
+#include <R.h>
+#include <R_ext/Applic.h>
+#include "Rinternals.h"
+#include "R_ext/Rdynload.h"
 
 // Fit initial solutions for unpenalized coefficients in elastic-net penalized models
 static void init_huber(double *beta, double *beta_old, double *x, double *x2, double *y, double *r, double *pf, double *d1, double *d2,
