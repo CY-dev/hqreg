@@ -10,8 +10,9 @@ double ksav(double *a, int size, int K);
 void standardize(double *x, double *x2, double *shift, double *scale, int n, int p);
 void rescale(double *x, double *x2, double *shift, double *scale, int n, int p);
 void postprocess(double *beta, double *shift, double *scale, int nlam, int p);
-void init_huber(double *beta, double *beta_old, double *x, double *x2, double *y, double *r, double *pf, 
-		double *d1, double *d2, double gamma, double gi, double thresh, int max_iter, int n, int p);
+void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2, 
+		double *y, double *r, double *pf, double *d1, double *d2, double gamma, 
+		double gi, double thresh, int n, int p, int max_iter);
 
 double sign(double x) {
   if (x > 0.0) return 1.0;
@@ -65,14 +66,18 @@ double maxprod(double *x, double *v, int n, int p, double *pf) {
 }
 
 // Semismooth Newton Coordinate Descent (SNCD)
-static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, double *pf, double *gamma_, double *alpha_, double *eps_, double *lambda_min_, 
-	int *nlam_, int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
+static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
+		       double *pf, double *gamma_, double *alpha_, double *eps_, double *lambda_min_, int *nlam_, 
+		       int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double gamma = gamma_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn, converged, mismatch; double gi = 1.0/gamma, pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, strfactor = 1.0; 
+  double pct, lstep, ldiff, lmax, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  int i, j, k, l, lp, jn, converged, mismatch; 
+  double gi = 1.0/gamma; // 1/gamma as a multiplier
+  double strfactor = 1.0; // scaling factor used for screening rule
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
