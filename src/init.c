@@ -125,7 +125,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
   }
 }
 
-void init_squared(double *beta, double *beta_old, int *iter, double *x, double x2bar, double *y, 
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, 
 		  double *r, double *pf, double thresh, int n, int p, int ppflag, int max_iter)
 {
   double gi = 1.0/gamma, v1, v2, change, max_update, update; int i, j, jn;
