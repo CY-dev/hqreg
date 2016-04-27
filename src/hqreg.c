@@ -38,13 +38,12 @@ void derivative_quantapprox(double *d1, double *d2, double *r, double gamma, dou
   double gi = 1.0/gamma;
   for (int i=0; i<n; i++) {
     if (fabs(r[i]) > gamma) {
-      d1[i] = sign(r[i]);
+      d1[i] = sign(r[i])+c;
       d2[i] = 0.0;
     } else {
-      d1[i] = r[i]*gi;
+      d1[i] = r[i]*gi+c;
       d2[i] = gi;
     }
-    d1[i] += c;
   }
 }
 
@@ -161,7 +160,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               pct += d2[i];
             }
 	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
-	    if (pct < 0.05 || pct < 1.0/n) {
+	    if (pct < 0.03 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
               v2 = 0.0; 
 	      for (i=0; i<n; i++) {
@@ -397,7 +396,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               pct += d2[i];
             }
 	    v1 = v1/(2*n); v2 = v2/(2*n); pct = pct*gamma/n;
-	    if (pct < 0.05 || pct < 1.0/n) {
+	    if (pct < 0.03 || pct < 1.0/n) {
 	      // Rprintf("j=%d, pct=%lf\n",j,pct);
 	      // approximate v2 with a continuation technique
               v2 = 0.0;
