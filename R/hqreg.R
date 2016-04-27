@@ -43,32 +43,30 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
   # Constant for quantile loss
   c <- 2*tau-1
   
-  # Setup vector d for generating the lambda sequence
-  d <- 0
+  # Flag for user-supplied lambda
   user <- 0
   if (missing(lambda)) {
     lambda <- double(nlambda)
-    d <- initDeriv(yy, X, method, gamma, c, penalty.factor)
   } else {
     nlambda <- length(lambda)
     user <- 1
   }
   
-  # Flag for preprocessing and screening
+  # Flags for preprocessing and screening
   ppflag = switch(preprocess, standardize = 1, rescale = 2, none = 0)
   scrflag = switch(screen, ASR = 1, SR = 2, none = 0)
   # Fitting
   if (alpha > 0) {
     if (method == "huber") {
-      fit <- .C("huber", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(d), as.double(penalty.factor), 
+      fit <- .C("huber", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(scrflag), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     } else if (method == "quantile") {
-      fit <- .C("quant", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(d), as.double(penalty.factor), 
+      fit <- .C("quant", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(tau), as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), 
                 as.integer(ppflag), as.integer(scrflag), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     } else {
-      fit <- .C("squared", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(d), as.double(penalty.factor), 
+      fit <- .C("squared", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag), as.integer(scrflag),
                 as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     }
@@ -84,15 +82,15 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
     lambda <- lambda[ind]
   } else {
     if (method == "huber") {
-      fit <- .C("huber_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(d), as.double(penalty.factor), 
+      fit <- .C("huber_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(max.iter), as.integer(user), as.integer(message))
     } else if (method == "quantile") {
-      fit <- .C("quantile_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(d), as.double(penalty.factor), 
+      fit <- .C("quantile_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(tau), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(max.iter), as.integer(user), as.integer(message))      
     } else {
-      fit <- .C("squared_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(d), as.double(penalty.factor), 
+      fit <- .C("squared_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(max.iter), as.integer(user), as.integer(message))      
     }
