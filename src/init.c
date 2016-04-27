@@ -128,7 +128,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
 void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, 
 		  double *r, double *pf, double thresh, int n, int p, int ppflag, int max_iter)
 {
-  double gi = 1.0/gamma, v1, v2, change, max_update, update; int i, j, jn;
+  double v1, v2, change, max_update, update; int i, j, jn;
   while(iter[0]<max_iter) {
     iter[0]++;
     max_update = 0.0;
@@ -144,9 +144,9 @@ void init_squared(double *beta, double *beta_old, int *iter, double *x, double *
         if (fabs(change) > 1e-6) {
 	  jn = j*n;
           for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
-	  update = (v2+l2*pf[j])*change*change*n;
+	  update = n*v2*change*change;
 	  if (update>max_update) max_update = update;
-	  beta_old[j] = beta[lp+j];
+	  beta_old[j] = beta[j];
         }
       }
     }
