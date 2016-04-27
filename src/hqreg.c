@@ -741,7 +741,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
 
   // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, d1, n, p, pf)/n;
+    lambda[0] = maxprod(x, d1, n, p, pf)/n*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -879,7 +879,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
     }
     temp = maxprod(x, d, n, p, pf);
     if (temp>lambda[0]) lambda[0] = temp;
-    lambda[0] = lambda[0]/(2*n);
+    lambda[0] = lambda[0]/(2*n)*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -1014,7 +1014,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
 
   // Set up lambda
   if (user==0) {
-    lambda[0] = maxprod(x, r, n, p, pf)/n;
+    lambda[0] = maxprod(x, r, n, p, pf)/n*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
