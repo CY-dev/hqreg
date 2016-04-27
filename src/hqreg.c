@@ -191,7 +191,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
             }
 	    // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
-            if (fabs(change) > 1e-6) {
+            if (fabs(change) > 1e-5) {
 	      //v2 = 0.0;
               for (i=0; i<n; i++) {
 		r[i] -= x[jn+i]*change;
@@ -428,7 +428,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
             }
 	    // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
-            if (fabs(change) > 1e-6) {
+            if (fabs(change) > 1e-5) {
 	      //v2 = 0.0;
               for (i=0; i<n; i++) {
 		r[i] -= x[jn+i]*change;
@@ -628,7 +628,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
             }
 	    // Update residuals
             change = beta[lp+j]-beta_old[j];       
-            if (fabs(change) > 1e-6) {
+            if (fabs(change) > 1e-5) {
 	      jn = j*n;
               for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
 	      update = (v2+l2*pf[j])*change*change*n;
@@ -784,7 +784,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
         }
 	// Update r, d1, d2 and compute candidate of max_update
         change = beta[lp+j]-beta_old[j];
-        if (fabs(change) > 1e-6) {
+        if (fabs(change) > 1e-5) {
 	  //v2 = 0.0;
           for (i=0; i<n; i++) {
 	    r[i] -= x[jn+i]*change;
@@ -929,7 +929,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
         }
 	// Update r, d1, d2 and compute candidate of max_update
         change = beta[lp+j]-beta_old[j];
-        if (fabs(change) > 1e-6) {
+        if (fabs(change) > 1e-5) {
 	  //v2 = 0.0;
           for (i=0; i<n; i++) {
 	    r[i] -= x[jn+i]*change;
@@ -1038,7 +1038,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
         }
 	// Update r
         change = beta[lp+j]-beta_old[j];       
-        if (fabs(change) > 1e-6) {
+        if (fabs(change) > 1e-5) {
 	  jn = j*n;              
           for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
 	  update = n*(v2+lambda[l]*pf[j])*change*change;
