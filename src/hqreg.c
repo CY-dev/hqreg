@@ -19,9 +19,8 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
 void init_quantile(double *beta, double *beta_old, int *iter, double *x, double *x2, 
 		   double *y, double *r, double *pf, double *d1, double *d2, double gamma,
 		   double c, double thresh, int n, int p, int max_iter);
-void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2, 
-		  double x2bar, double *y, double *r, double *pf, double thresh, int n, 
-                  int p, int ppflag, int max_iter);
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double x2bar, double *y, 
+		  double *r, double *pf, double thresh, int n, int p, int ppflag, int max_iter);
 
 void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
   double gi = 1.0/gamma;
