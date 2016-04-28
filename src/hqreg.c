@@ -441,7 +441,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	      }
 	      //v2 += 2*n*l2*pf[j];
 	      //update = v2*change*change;
-              update = (v2+l2*pf[j])*change*change*n;
+              update = (v2+l2*pf[j])*change*change*n*2;
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
