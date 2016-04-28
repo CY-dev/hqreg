@@ -120,7 +120,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
   }
 
-  for (j=0; j<p; j++) z[j] = crossprod(x, d1, n, j)/n;
+  for (j=0; j<p; j++) if (pf[j] > 0) z[j] = crossprod(x, d1, n, j)/n;
 
   // Solution path
   for (l=1; l<nlam; l++) {
@@ -348,8 +348,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
   }
 
-  for (j=0; j<p; j++) z[j] = crossprod(x, d1, n, j)/(2*n);
-
+  for (j=0; j<p; j++) if (pf[j] > 0) z[j] = crossprod(x, d1, n, j)/(2*n);
+  
   // Solution path
   for (l=1; l<nlam; l++) {
     if (gamma>0.001) {
@@ -575,7 +575,9 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
   }
-
+  
+  for (j=0; j<p; j++) if (pf[j] > 0) z[j] = crossprod(x, r, n, j)/n;
+  
   // Solution path
   for (l=1; l<nlam; l++) {
     converged = 0; lp = l*p;
@@ -767,7 +769,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
 	    if (d2[i]) {
 	      v2 += x2[jn+i]*d2[i];
 	    } else { // |r_i|>gamma
-              v2 += x2[jn+i]*d1[i]/r[i];
+              v2 += x2[jn+i]/fabs(r[i]);
             }
           }
           v2 = v2/n;
@@ -911,7 +913,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
             if (d2[i]) {
               v2 += x2[jn+i]*d2[i];
             } else { // |r_i| > gamma
-              v2 += x2[jn+i]*(d1[i]-c)/r[i];
+              v2 += x2[jn+i]/fabs(r[i]);
             }
           }
           v2 = v2/(2*n);
