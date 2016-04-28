@@ -395,7 +395,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	      // approximate v2 with a continuation technique
 	      for (i=0; i<n; i++) {
 	      	temp = fabs(r[i]);
-		if (temp > gamma) v2 += x2[jn+i]/(temp*10);
+		if (temp > gamma && temp < 10*gamma) v2 += x2[jn+i]/temp;
               }
 	    }
 	    v1 = v1/(2.0*n); v2 = v2/(2.0*n);
