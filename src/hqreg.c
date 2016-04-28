@@ -167,7 +167,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 		if (d2[i]) {
 		  v2 += x2[jn+i]*d2[i];
 		} else { // |r_i|>gamma
-                  v2 += x2[jn+i]*d1[i]/r[i];
+                  v2 += x2[jn+i]/fabs(r[i]);
                 }
               }
               v2 = v2/n;
@@ -302,7 +302,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
   }
   int violations = 0, nv = 0;
-  int m = (int) (n*0.10);
+  int m = n/10;
 
   // Preprocessing
   if (ppflag == 1) {
@@ -324,7 +324,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   }
   thresh = eps*nullDev;
   gamma = ksav(r, n, m);
-  if (gamma<0.0001) gamma = 0.0001;
+  if (gamma<0.001) gamma = 0.001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
 
   // Find initial solutions for lambda[0]
@@ -352,11 +352,11 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 
   // Solution path
   for (l=1; l<nlam; l++) {
-    if (gamma>0.0001) {
+    if (gamma>0.001) {
       temp = ksav(r, n, m);
       if (temp < gamma) gamma = temp;
     }
-    if (gamma<0.0001) gamma = 0.0001;
+    if (gamma<0.001) gamma = 0.001;
     gi = 1.0/gamma;
     if (message) Rprintf("Lambda %d: Gamma = %f\n", l+1, gamma);
     converged = 0; lp = l*p;
@@ -403,7 +403,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                 if (d2[i]) {
                   v2 += x2[jn+i]*d2[i];
                 } else { // |r_i| > gamma
-                  v2 += x2[jn+i]*(d1[i]-c)/r[i];
+                  v2 += x2[jn+i]/fabs(r[i]);
                 }
               }
               v2 = v2/(2*n);
