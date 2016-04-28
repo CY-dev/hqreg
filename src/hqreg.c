@@ -431,7 +431,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	      }
 	      //v2 += 2*n*l2*pf[j];
 	      //update = v2*change*change;
-              update = (v2+l2*pf[j])*change*change*n*2;
+              update = (v2+l2*pf[j])*change*change*n*2.0;
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
@@ -919,7 +919,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
               d2[i] = gi;
 	    }
 	  }
-          update = n*(v2*change*change + 2*fabs(v1*change));
+          update = (v2+lambda[l]*pf[j])*change*change*n*2.0;
           if (update>max_update) max_update = update;
           beta_old[j] = beta[lp+j];
         }
@@ -1019,7 +1019,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
         if (fabs(change) > 1e-6) {
 	  jn = j*n;              
           for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
-	  update = n*(v2+lambda[l]*pf[j])*change*change;
+	  update = (v2+lambda[l]*pf[j])*change*change*n;
 	  if (update>max_update) max_update = update;
 	  beta_old[j] = beta[lp+j];
         }
