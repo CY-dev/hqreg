@@ -66,7 +66,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
 		   double *y, double *r, double *pf, double *d1, double *d2, double gamma, 
 		   double c, double thresh, int n, int p, int max_iter)
 {
-  double gi = 1.0/gamma, v1, v2, pct, change, max_update, update; int i, j, jn, num_unpenalized = 0;
+  double gi = 1.0/gamma, v1, v2, pct, temp, change, max_update, update; int i, j, jn, num_unpenalized = 0;
   // return when only intercept is unpenalized since intercept = quantile(y, tau) = 0
   for (j=1; j<p; j++) if(pf[j] == 0.0) num_unpenalized++;
   if (num_unpenalized == 0) return;
