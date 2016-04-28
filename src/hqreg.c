@@ -438,7 +438,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           }
         }
         // Check for convergence
-        if (iter[l]>5) {
+        if (iter[l]>1) {
           if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
@@ -891,7 +891,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
           pct += d2[i];
         }
 	pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
-	if (pct < 0.05 || pct < 1.0/n) {
+	if (pct < 0.08 || pct < 1.0/n) {
 	  // approximate v2 with a continuation technique
 	  for (i=0; i<n; i++) {
 	    temp = fabs(r[i]);
