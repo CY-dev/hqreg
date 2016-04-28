@@ -348,7 +348,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   // Solution path
   for (l=1; l<nlam; l++) {
     if (gamma>0.0005) {
-      gamma = ksav(r, n, m);
+      temp = ksav(r, n, m);
       if (temp < gamma) gamma = temp;
     }
     if (gamma<0.0005) gamma = 0.0005;
