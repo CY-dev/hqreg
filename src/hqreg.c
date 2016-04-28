@@ -159,20 +159,15 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               v2 += x2[jn+i]*d2[i];
               pct += d2[i];
             }
-	    v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
+	    pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
 	    if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
-              v2 = 0.0; 
 	      for (i=0; i<n; i++) {
-		if (d2[i]) {
-		  v2 += x2[jn+i]*d2[i];
-		} else { // |r_i|>gamma
-                  v2 += x2[jn+i]/fabs(r[i]);
-                }
+	      	temp = fabs(r[i]);
+		if (temp > gamma) v2 += x2[jn+i]/temp;
               }
-              v2 = v2/n;
-              // Rprintf("After: v2=%f\n", v2);              
 	    }
+	    v1 = v1/n; v2 = v2/n;
             // Update beta_j
             if (pf[j]==0.0) { // unpenalized
 	      beta[lp+j] = beta_old[j] + v1/v2; 
@@ -395,20 +390,15 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               v2 += x2[jn+i]*d2[i];
               pct += d2[i];
             }
-	    v1 = v1/(2*n); v2 = v2/(2*n); pct = pct*gamma/n;
+	    pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
 	    if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
-              v2 = 0.0;
 	      for (i=0; i<n; i++) {
-                if (d2[i]) {
-                  v2 += x2[jn+i]*d2[i];
-                } else { // |r_i| > gamma
-                  v2 += x2[jn+i]/fabs(r[i]);
-                }
+	      	temp = fabs(r[i]);
+		if (temp > gamma) v2 += x2[jn+i]/temp;
               }
-              v2 = v2/(2*n);
-              //Rprintf("After: v2=%f\n", v2);
 	    }
+	    v1 = v1/(2.0*n); v2 = v2/(2.0*n);
             // Update beta_j
             if (pf[j]==0.0) { // unpenalized
 	      beta[lp+j] = beta_old[j] + v1/v2;
@@ -761,20 +751,15 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
           v2 += x2[jn+i]*d2[i];
           pct += d2[i];
         }
-	v1 = v1/n; v2 = v2/n; pct = pct*gamma/n;
+	pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
 	if (pct < 0.05 || pct < 1.0/n) {
 	  // approximate v2 with a continuation technique
-          v2 = 0.0; 
 	  for (i=0; i<n; i++) {
-	    if (d2[i]) {
-	      v2 += x2[jn+i]*d2[i];
-	    } else { // |r_i|>gamma
-              v2 += x2[jn+i]/fabs(r[i]);
-            }
-          }
-          v2 = v2/n;
-          // Rprintf("After: v2=%f\n", v2);              
+	    temp = fabs(r[i]);
+	    if (temp > gamma) v2 += x2[jn+i]/temp;
+	  }
 	}
+	v1 = v1/n; v2 = v2/n;
         // Update beta_j
         if (pf[j]==0.0) { // unpenalized
 	  beta[lp+j] = beta_old[j] + v1/v2; 
@@ -905,20 +890,15 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
           v2 += x2[jn+i]*d2[i];
           pct += d2[i];
         }
-	v1 = v1/(2*n); v2 = v2/(2*n); pct = pct*gamma/n;
+	pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
 	if (pct < 0.05 || pct < 1.0/n) {
 	  // approximate v2 with a continuation technique
-          v2 = 0.0;
 	  for (i=0; i<n; i++) {
-            if (d2[i]) {
-              v2 += x2[jn+i]*d2[i];
-            } else { // |r_i| > gamma
-              v2 += x2[jn+i]/fabs(r[i]);
-            }
-          }
-          v2 = v2/(2*n);
-          //Rprintf("After: v2=%f\n", v2);
+	    temp = fabs(r[i]);
+	    if (temp > gamma) v2 += x2[jn+i]/temp;
+	  }
 	}
+	v1 = v1/(2.0*n); v2 = v2/(2.0*n);
         // Update beta_j
         if (pf[j]==0.0) { // unpenalized
 	  beta[lp+j] = beta_old[j] + v1/v2; 
