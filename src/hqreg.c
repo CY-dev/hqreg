@@ -448,7 +448,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           }
         }
         // Check for convergence
-        if (iter[l]>1) {
+        if (iter[l]>5) {
           if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
