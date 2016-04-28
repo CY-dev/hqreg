@@ -884,11 +884,11 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
 
   // Solution path
   for (l=0; l<nlam; l++) {
-    if (gamma>0.0001 && l>0) {
+    if (gamma>0.001 && l>0) {
       temp = ksav(r, n, m);
       if (temp < gamma) gamma = temp;
     }
-    if (gamma<0.0001) gamma = 0.0001;
+    if (gamma<0.001) gamma = 0.001;
     gi = 1.0/gamma;
     if (message) Rprintf("Lambda %d: Gamma = %f\n", l+1, gamma);
     converged = 0; lp = l*p;
