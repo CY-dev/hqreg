@@ -206,7 +206,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
           }
         }
         // Check for convergence
-        if (iter[l]>1) {
+        if (iter[l] > 1) {
           if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
@@ -438,7 +438,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           }
         }
         // Check for convergence
-        if (iter[l]>= 10) {
+        if (iter[l] > 1) {
           if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
@@ -628,7 +628,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
           }
         }             
         // Check for convergence
-        if (iter[l]>1) {
+        if (iter[l] > 1) {
           if (!mismatch && max_update < thresh) {
             converged = 1;
 	    break;
@@ -788,7 +788,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
         }
       }
       // Check for convergence
-      if (iter[l]>1) {
+      if (iter[l] > 1) {
         if (max_update < thresh) {
           converged = 1;
 	  break;
@@ -925,7 +925,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
         }
       }
       // Check for convergence
-      if (iter[l] >= 10) {
+      if (iter[l] > 1) {
         if (max_update < thresh) {
           converged = 1;
 	  break;
@@ -1025,7 +1025,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
         }
       }
       // Check for convergence
-      if (iter[l]>1) {
+      if (iter[l] > 1) {
         if (max_update < thresh) {
           converged = 1;
 	  break;
