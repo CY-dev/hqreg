@@ -385,7 +385,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           if (include[j]) {
             int it = 0;
             update = 2*thresh;
-            while (update > thresh && it < 100) {
+            while (update > thresh && it < 10) {
+            it++;
             Rprintf("beta[%d] = %f, update = %f\n", j, beta_old[lp+j], update);
             // Calculate v1, v2
 	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
