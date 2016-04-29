@@ -438,10 +438,10 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
             } else update = 0;
             if(l == 47) Rprintf("pct = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update = %f, thresh = %f\n", pct, j, beta[lp+j], s[j], mismatch, max_update, thresh);
             if(it> 1 && !mismatch && update < thresh) {
-              if (update>max_update) max_update = update;
               break;
             }
             }
+            if (update>max_update) max_update = update;
           }
         }
         // Check for convergence
