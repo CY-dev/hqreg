@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab hqreg\cr
 Type: \tab Package\cr
-Version: \tab 1.2-9\cr
-Date: \tab 2016-04-27\cr
+Version: \tab 1.2-13\cr
+Date: \tab 2016-04-29\cr
 License: \tab GPL-3\cr
 }
 Very simple to use. Accepts \code{X,y} data for regression models, and
