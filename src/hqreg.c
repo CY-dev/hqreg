@@ -384,7 +384,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         for (j=0; j<p; j++) {
           if (include[j]) {
             update = 0.0;
-            for (int it = 1; it < 5; it++) {
+            for (int it = 1; it <= 5; it++) {
             // Calculate v1, v2
 	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
             for (i=0; i<n; i++) {
@@ -432,7 +432,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	          //v2 += x2[jn+i]*d2[i];
 	        }
 	      }
-              update = (v2+l2*pf[j])*change*change*n*2;
+              update = (v2+l2*pf[j])*change*change*n*5;
               if (update > max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
