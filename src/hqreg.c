@@ -383,10 +383,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         mismatch = 0; max_update = 0.0;
         for (j=0; j<p; j++) {
           if (include[j]) {
-            int it = 0;
-            update = 2*thresh;
-            while (update > thresh && it < 5) {
-            it++;
+            for (int it = 0; it <5; it++) {
             // Calculate v1, v2
 	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
             for (i=0; i<n; i++) {
@@ -414,7 +411,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               beta[lp+j] = 0.0;
             }
             // mark the first mismatch between beta and s
-	    if (!mismatch && pf[j] > 0) {
+	    if (pf[j] > 0) {
               if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
 		 mismatch = 1;
             }
@@ -439,7 +436,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             } else {update = 0;}
-            if(l == 62) Rprintf("pct = %f, change = %f, beta[%d] = %f, s = %f, mismatch = %d\n", pct, change, j, beta[lp+j], s[j], mismatch);
+            if(l == 62) Rprintf("pct = %f, change = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update, thresh\n", pct, change, j, beta[lp+j], s[j], mismatch, max_update, thresh);
+            if(it> 1 && !mismatch) break;
             }
           }
         }
