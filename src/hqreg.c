@@ -384,7 +384,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         for (j=0; j<p; j++) {
           if (include[j]) {
             update = 0.0;
-            for (int it = 1; it <= 5; it++) {
+            for (int it = 1; it <= 3; it++) {
             // Calculate v1, v2
 	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
             for (i=0; i<n; i++) {
@@ -393,7 +393,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               pct += d2[i];
             }
 	    pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
-	    if (pct < 0.01 || pct < 1.0/n) {
+	    if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
 	      for (i=0; i<n; i++) {
 	      	temp = fabs(r[i]);
@@ -437,7 +437,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               beta_old[j] = beta[lp+j];
             }
             if(l == 50) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
-            if(!mismatch && update < thresh) break;
+            if(!mismatch) break;
             }
           }
         }
