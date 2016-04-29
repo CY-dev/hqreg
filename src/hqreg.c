@@ -436,18 +436,18 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             } else {update = 0;}
-            if(l == 62) Rprintf("pct = %f, change = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update, thresh\n", pct, change, j, beta[lp+j], s[j], mismatch, max_update, thresh);
+            if(l == 37) Rprintf("pct = %f, change = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update, thresh\n", pct, change, j, beta[lp+j], s[j], mismatch, max_update, thresh);
             if(it> 1 && !mismatch) break;
             }
           }
         }
         // Check for convergence
-        if (iter[l] > 1) {
-          if (!mismatch && max_update < thresh) {
+        //if (iter[l] > 1) {
+          if (max_update < thresh) {
             converged = 1;
 	    break;
 	  }
-        }
+        //}
       }
       // Scan for violations of the screening rule and count nonzero variables
       violations = 0; nnzero = 0;
