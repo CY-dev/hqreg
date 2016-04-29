@@ -393,7 +393,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               pct += d2[i];
             }
 	    pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
-	    if (pct < 0.08 || pct < 1.0/n) {
+	    if (pct < 0.05 || pct < 1.0/n) {
 	      // approximate v2 with a continuation technique
 	      for (i=0; i<n; i++) {
 	      	temp = fabs(r[i]);
@@ -432,7 +432,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	          //v2 += x2[jn+i]*d2[i];
 	        }
 	      }
-              update = (v2+l2*pf[j])*change*change*n*5.0;
+              update = (v2+l2*pf[j])*change*change*n*4.0;
               if (update > max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
