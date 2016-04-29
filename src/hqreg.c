@@ -384,7 +384,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         for (j=0; j<p; j++) {
           if (include[j]) {
             update = 0.0;
-            for (int it = 1; it <= 5; it++) {
+            for (int it = 1; it <= 3; it++) {
             // Calculate v1, v2
 	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
             for (i=0; i<n; i++) {
@@ -436,7 +436,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               if (update > max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
-            if(l == 47) Rprintf("pct = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update = %f, thresh = %f\n", pct, j, beta[lp+j], s[j], mismatch, max_update, thresh);
+            if(l == 99) Rprintf("pct = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update = %f, thresh = %f\n", pct, j, beta[lp+j], s[j], mismatch, max_update, thresh);
             if(!mismatch && update < thresh) break;
             }
           }
