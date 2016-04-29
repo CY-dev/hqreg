@@ -436,7 +436,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             } else {update = 0;}
-            if(l == 37) Rprintf("pct = %f, change = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update, thresh\n", pct, change, j, beta[lp+j], s[j], mismatch, max_update, thresh);
+            if(l == 46) Rprintf("pct = %f, change = %f, beta[%d] = %f, s = %f, mismatch = %d, max_update, thresh\n", pct, change, j, beta[lp+j], s[j], mismatch, max_update, thresh);
             if(it> 1 && !mismatch) break;
             }
           }
