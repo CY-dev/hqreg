@@ -383,6 +383,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         mismatch = 0; max_update = 0.0;
         for (j=0; j<p; j++) {
           if (include[j]) {
+            update = 0.0;
+            while (update > thresh) {
             // Calculate v1, v2
 	    jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
             for (i=0; i<n; i++) {
@@ -435,6 +437,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               if (update>max_update) max_update = update;
               beta_old[j] = beta[lp+j];
             }
+          }
           }
         }
         // Check for convergence
