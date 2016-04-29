@@ -410,7 +410,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               s[j] = (v1+v2*beta_old[j])/(l1*pf[j]);
               beta[lp+j] = 0.0;
             }
-            // mark the first mismatch between beta and s
+            // mismatch between beta and s
+            mismatch = 0;
 	    if (pf[j] > 0) {
               if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
 		 mismatch = 1;
