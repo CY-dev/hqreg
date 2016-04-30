@@ -479,6 +479,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     //if (message) Rprintf("# iterations = %d\n", iter[l]);
   }
   if (scrflag != 0 && message) Rprintf("# KKT violations detected and fixed: %d\n", nv);
+  if (message) Rprintf("Lambda[%d]: # iterations = %d\n", l, iter[l]);
   numv[0] = nv;
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nlam, p);
