@@ -102,7 +102,7 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma, tau = 0.5
   vnames <- colnames(X)
   if (is.null(vnames)) vnames=paste0("V",seq(p-1))
   vnames <- c("(Intercept)", vnames)
-  dimnames(beta) <- list(vnames, round(lambda, 4))
+  dimnames(beta) <- list(vnames, paste0("L", !is.na(iter))
   
   # Output
   structure(list(call = call,
