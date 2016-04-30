@@ -241,13 +241,13 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
           if (beta_old[j] != 0) nnzero++;
         }
       }
+      if (message) Rprintf("Lambda[%d]: # iterations = %d\n", l, iter[l]);
       if (violations == 0) break;
       nv += violations;
     }
     //Rprintf("iter[%d] = %d, beta[0] = %f\n", l+1, iter[l], beta[l*p]);
   }
   if (scrflag != 0 && message) Rprintf("# violations detected and fixed: %d\n", nv);
-  if (message) Rprintf("Lambda[%d]: # iterations = %d\n", l, iter[l]);
   numv[0] = nv;
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nlam, p);
