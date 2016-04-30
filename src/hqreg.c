@@ -241,7 +241,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
           if (beta_old[j] != 0) nnzero++;
         }
       }
-      if (message) Rprintf("Lambda[%d]: # iterations = %d\n", l, iter[l]);
+      if (message) Rprintf("Lambda %d: # iterations = %d\n", l+1, iter[l]);
       if (violations == 0) break;
       nv += violations;
     }
@@ -474,7 +474,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           if (beta_old[j] != 0) nnzero++;
         }
       }
-      if (message) Rprintf("Lambda[%d]: # iterations = %d\n", l, iter[l]);
+      if (message) Rprintf("Lambda %d: # iterations = %d\n", l, iter[l]);
       if (violations == 0) break;
       nv += violations;
     }
