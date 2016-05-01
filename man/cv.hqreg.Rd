@@ -4,8 +4,7 @@
 \description{Perform k-fold cross validation for elastic-net penalized Huber loss regression 
   and quantile regression over a sequence of lambda values and find an optimal lambda.}
 \usage{
-cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, 
-        type.measure = c("deviance", "mse", "mae"), seed, trace = FALSE)
+cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, type.measure = c("deviance", "mse", "mae"), seed)
 }
 \arguments{
   \item{X}{The input matrix, as in \code{hqreg}.}
@@ -23,9 +22,6 @@ cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id,
   \item{type.measure}{The default is "deviance", which uses the chosen loss function of the model. 
   Other options include "mse" for mean squared error and "mae" for mean absolute error.}
   \item{seed}{(Optional) Seed for the random number generator in order to obtain reproducible results.}
-  \item{trace}{If set to TRUE, cv.hqreg will inform the user of its
-    progress by announcing the beginning of each CV fold.  Default is
-    FALSE.}
   }
 \details{
 The function randomly partitions the data in \code{nfolds}. It calls \code{hqreg} 
