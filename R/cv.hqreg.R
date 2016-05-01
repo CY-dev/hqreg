@@ -1,10 +1,10 @@
-cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), 
-                     seed, trace=FALSE) {
+cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), seed) {
   type.measure = match.arg(type.measure)
   if (!missing(seed)) set.seed(seed)
   fit <- hqreg(X, y, ...)
   cv.args <- list(...)
   cv.args$lambda <- fit$lambda
+  cv.args$alpha <- fit$alpha
   cv.args$gamma <- fit$gamma
   cv.args$tau <- fit$tau
   measure.args <- list(method=fit$method, gamma=fit$gamma, tau=fit$tau, type.measure = type.measure)
@@ -38,7 +38,7 @@ cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c
     if (parallel) {
       fit.i <- fold.results[[i]]
     } else {
-      if (trace) cat("Starting CV fold #",i,sep="","\n")
+      cat("CV fold #",i,sep="","\n")
       fit.i <- cvf(i, X, y, fold.id, cv.args, measure.args)
     }
     E[fold.id == i, 1:fit.i$nl] <- fit.i$pe
