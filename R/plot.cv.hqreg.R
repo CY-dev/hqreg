@@ -12,7 +12,7 @@ plot.cv.hqreg <- function(x, log.l = TRUE, nvars = TRUE, ...)
   y <- x$cve
   L <- L.cve
   U <- U.cve
-  ylab <- "Cross-validation Error"
+  ylab = switch(x$type.measure, deviance = "Deviance", mae = "Mean Absolute Error", mse = "Mean Squared Error")
   
   ylim <- range(c(L, U))
   ind <- ((U-L)/diff(ylim) > 1e-3)
