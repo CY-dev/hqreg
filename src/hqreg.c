@@ -299,7 +299,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
   }
   int violations = 0, nv = 0;
-  int m = n/10;
+  int m = n/10 + 1;
 
   // Preprocessing
   if (ppflag == 1) {
@@ -834,7 +834,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   double *d = Calloc(n, double);
   double *d1 = Calloc(n, double);
   double *d2 = Calloc(n, double);
-  int m = (int) (n*0.10);
+  int m = n/10 + 1;
 
   // Preprocessing
   if (ppflag == 1) {
@@ -855,6 +855,8 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
     nullDev += fabs(r[i]) + c*r[i];
   }
   thresh = eps*nullDev;
+  gamma = ksav(r, n, m);
+  if (gamma<0.001) gamma = 0.001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
 
   // Set up lambda
