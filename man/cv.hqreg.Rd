@@ -39,6 +39,7 @@ they should call \code{cv.hqreg} for each combination of these parameters and us
   The function returns an object of S3 class \code{"cv.hqreg"}, which is a list containing:
   \item{cve}{The error for each value of \code{lambda}, averaged across the cross-validation folds.}
   \item{cvse}{The estimated standard error associated with each value of \code{cve}.}
+  \item{type.measure}{The same as above.}
   \item{lambda}{The values of \code{lambda} used in the cross-validation fits.}
   \item{fit}{The fitted \code{hqreg} object for the whole data.}
   \item{lambda.1se}{The largest \code{lambda} such that the error is within 1 standard 
