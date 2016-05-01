@@ -55,7 +55,7 @@ cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c
   index.min <- which.min(cve)
   # adjust the selection using 1-SD method
   index.1se <- min(which(cve < cve[index.min]+cvse[index.min]))
-  val <- list(cve = cve, cvse = cvse, lambda = lambda, fit = fit, 
+  val <- list(cve = cve, cvse = cvse, type.measure = type.measure, lambda = lambda, fit = fit, 
               lambda.1se = lambda[index.1se], lambda.min = lambda[index.min])
   structure(val, class="cv.hqreg")
 }
