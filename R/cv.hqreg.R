@@ -6,6 +6,7 @@ cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c
   cv.args <- list(...)
   cv.args$lambda <- fit$lambda
   cv.args$gamma <- fit$gamma
+  cv.args$tau <- fit$tau
   measure.args <- list(method=fit$method, gamma=fit$gamma, tau=fit$tau, type.measure = type.measure)
   E <- matrix(NA, nrow=length(y), ncol=length(cv.args$lambda))
   n <- length(y)
