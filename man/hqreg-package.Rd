@@ -8,7 +8,7 @@
 \tabular{ll}{
 Package: \tab hqreg\cr
 Type: \tab Package\cr
-Version: \tab 1.2-14\cr
+Version: \tab 1.2-15\cr
 Date: \tab 2016-05-01\cr
 License: \tab GPL-3\cr
 }
