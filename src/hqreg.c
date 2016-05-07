@@ -1022,8 +1022,10 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
       max_update = 0.0; 
       for (j=0; j<p; j++) {
         if (j == 0 && ppflag == 1) continue; // intercept is constant for standardized data
-        // Update v1, v2=x2bar[j]
-      	v1 = crossprod(x, r, n, j)/n; v2 = x2bar[j];
+      	for (k=0; k<5; k++) {
+      	  update = 0.0;
+          // Update v1, v2=x2bar[j]
+          v1 = crossprod(x, r, n, j)/n; v2 = x2bar[j];
         // Update beta_j
         if (pf[j] == 0.0) { // unpenalized
 	  beta[lp+j] = beta_old[j] + v1/v2;
@@ -1039,6 +1041,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
 	  if (update > max_update) max_update = update;
 	  beta_old[j] = beta[lp+j];
         }
+      	}
       }
       // Check for convergence
       if (iter[l] > 1) {
