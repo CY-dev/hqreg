@@ -750,55 +750,58 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
       iter[l]++;
       max_update = 0.0; 
       for (j=0; j<p; j++) {
-        // Calculate v1, v2
-	jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
-        for (i=0; i<n; i++) {
-          v1 += x[jn+i]*d1[i];
-          v2 += x2[jn+i]*d2[i];
-          pct += d2[i];
-        }
-	pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
-	if (pct < 0.05 || pct < 1.0/n) {
-	  // approximate v2 with a continuation technique
-	  for (i=0; i<n; i++) {
-	    temp = fabs(r[i]);
-	    if (temp > gamma) v2 += x2[jn+i]/temp;
-	  }
-	}
-	v1 = v1/n; v2 = v2/n;
-        // Update beta_j
-        if (pf[j] == 0.0) { // unpenalized
-	  beta[lp+j] = beta_old[j] + v1/v2; 
-        } else {
-          beta[lp+j] = beta_old[j] + (v1-lambda[l]*pf[j]*beta_old[j])/(v2+lambda[l]*pf[j]); 
-        }
-	// Update r, d1, d2 and compute candidate of max_update
-        change = beta[lp+j]-beta_old[j];
-        if (fabs(change) > 1e-6) {
-	  //v2 = 0.0;
+      	for (k=0; k<5; k++) {
+      	  // Calculate v1, v2
+          jn = j*n; v1 = 0.0; v2 = 0.0; pct = 0.0;
           for (i=0; i<n; i++) {
-	    r[i] -= x[jn+i]*change;
-            if (fabs(r[i]) > gamma) {
-              d1[i] = sign(r[i]);
-              d2[i] = 0.0;
-            } else {
-	      d1[i] = r[i]*gi;
-              d2[i] = gi;
-	      //v2 += x2[jn+i]*d2[i];
-	    }
-	  }
-	  //v2 += n*lambda[l]*pf[j];
-	  update = (v2+lambda[l]*pf[j])*change*change*n;
-          if (update > max_update) max_update = update;
-          beta_old[j] = beta[lp+j];
+            v1 += x[jn+i]*d1[i];
+            v2 += x2[jn+i]*d2[i];
+            pct += d2[i];
+          }
+          pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
+          if (pct < 0.05 || pct < 1.0/n) {
+            // approximate v2 with a continuation technique
+            for (i=0; i<n; i++) {
+              temp = fabs(r[i]);
+              if (temp > gamma) v2 += x2[jn+i]/temp;
+            }
+          }
+          v1 = v1/n; v2 = v2/n;
+          // Update beta_j
+          if (pf[j] == 0.0) { // unpenalized
+            beta[lp+j] = beta_old[j] + v1/v2; 
+          } else {
+            beta[lp+j] = beta_old[j] + (v1-lambda[l]*pf[j]*beta_old[j])/(v2+lambda[l]*pf[j]); 
+          }
+          // Update r, d1, d2 and compute candidate of max_update
+          change = beta[lp+j]-beta_old[j];
+          if (fabs(change) > 1e-6) {
+            //v2 = 0.0;
+            for (i=0; i<n; i++) {
+              r[i] -= x[jn+i]*change;
+              if (fabs(r[i]) > gamma) {
+                d1[i] = sign(r[i]);
+                d2[i] = 0.0;
+              } else {
+                d1[i] = r[i]*gi;
+                d2[i] = gi;
+                //v2 += x2[jn+i]*d2[i];
+              }
+            }
+            //v2 += n*lambda[l]*pf[j];
+            update = (v2+lambda[l]*pf[j])*change*change*n;
+            if (update > max_update) max_update = update;
+            beta_old[j] = beta[lp+j];
+          }
+          if (update < thresh) break;
         }
       }
       // Check for convergence
       if (iter[l] > 1) {
         if (max_update < thresh) {
           converged = 1;
-	  break;
-	}
+          break;
+        }
       }
     }
   }
