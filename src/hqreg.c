@@ -634,11 +634,9 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
           }
         }             
         // Check for convergence
-        if (iter[l] > 1) {
-          if (!mismatch && max_update < thresh) {
-            converged = 1;
-	    break;
-	  }
+        if (!mismatch && max_update < thresh) {
+          converged = 1;
+          break;
         }
       }
       // Scan for violations of the screening rule and count nonzero variables
@@ -798,11 +796,9 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
         }
       }
       // Check for convergence
-      if (iter[l] > 1) {
-        if (max_update < thresh) {
-          converged = 1;
-          break;
-        }
+      if (max_update < thresh) {
+        converged = 1;
+        break;
       }
     }
   }
@@ -933,7 +929,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
                 d2[i] = gi;
               }
             }
-            update = (v2+lambda[l]*pf[j])*change*change*n;
+            update = (v2+lambda[l]*pf[j])*change*change*n*4;
             if (update > max_update) max_update = update;
             beta_old[j] = beta[lp+j];
           }
@@ -941,11 +937,9 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
       	}
       }
       // Check for convergence
-      if (iter[l] > 5) {
-        if (max_update < thresh) {
-          converged = 1;
-	  break;
-	}
+      if (max_update < thresh) {
+        converged = 1;
+        break;
       }
     }
   }
@@ -1026,29 +1020,28 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
       	  update = 0.0;
           // Update v1, v2=x2bar[j]
           v1 = crossprod(x, r, n, j)/n; v2 = x2bar[j];
-        // Update beta_j
-        if (pf[j] == 0.0) { // unpenalized
-	  beta[lp+j] = beta_old[j] + v1/v2;
-	} else {
-          beta[lp+j] = beta_old[j] + (v1-lambda[l]*pf[j]*beta_old[j])/(v2+lambda[l]*pf[j]);
+          // Update beta_j
+          if (pf[j] == 0.0) { // unpenalized
+            beta[lp+j] = beta_old[j] + v1/v2;
+          } else {
+            beta[lp+j] = beta_old[j] + (v1-lambda[l]*pf[j]*beta_old[j])/(v2+lambda[l]*pf[j]);
+          }
+          // Update r
+          change = beta[lp+j]-beta_old[j];       
+          if (fabs(change) > 1e-6) {
+            jn = j*n;              
+            for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
+            update = (v2+lambda[l]*pf[j])*change*change*n;
+            if (update > max_update) max_update = update;
+            beta_old[j] = beta[lp+j];
+          }
+          if (update < thresh) break;
         }
-	// Update r
-        change = beta[lp+j]-beta_old[j];       
-        if (fabs(change) > 1e-6) {
-	  jn = j*n;              
-          for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
-	  update = (v2+lambda[l]*pf[j])*change*change*n;
-	  if (update > max_update) max_update = update;
-	  beta_old[j] = beta[lp+j];
-        }
-      	}
       }
       // Check for convergence
-      if (iter[l] > 1) {
-        if (max_update < thresh) {
-          converged = 1;
-	  break;
-	}
+      if (max_update < thresh) {
+        converged = 1;
+        break;
       }
     }
   }
