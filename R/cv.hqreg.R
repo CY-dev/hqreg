@@ -16,9 +16,9 @@ cv.hqreg <- function(X, y, ..., ncores = 1, nfolds=10, fold.id, type.measure = c
   if (ncores > 1) {
     max.cores <- detectCores()
     if (ncores > max.cores) {
-      print(paste("The number of cores specified (", ncores, ") is larger 
+      cat("The number of cores specified (", ncores, ") is larger 
                   than the number of avaiable cores (", max.cores, ") so",
-                  max.cores, " cores are used.", sep = ""))
+                  max.cores, "cores are used.", "\n")
       ncores = max.cores
     }
     cluster <- makeCluster(ncores)
