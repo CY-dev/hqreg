@@ -5,7 +5,8 @@ Version: 1.2-16
 Date: 2016-05-08
 Author: Congrui Yi
 Maintainer: Congrui Yi <congrui-yi@uiowa.edu>
-Description: Efficient algorithms for fitting regularization paths for Huber loss regression and quantile regression penalized by lasso or elastic-net.
+Description: Efficient algorithms for fitting regularization paths for lasso or elastic-net penalized regression models with 
+  Huber loss, quantile loss or squared loss.
 License: GPL-3
 NeedsCompilation: yes
 Imports: parallel
