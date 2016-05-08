@@ -1,9 +1,9 @@
 \name{hqreg-package}
 \alias{hqreg-package}
 \docType{package}
-\title{Regularization Paths for Huber Loss Regression and Quantile Regression Penalized by Lasso or Elastic-net}
-\description{Efficient algorithms for fitting coefficient paths for regression models with 
-  Huber loss, quantile loss or squared loss penalized by lasso or elastic-net.}
+\title{Regularization Paths for Lasso or Elastic-net Penalized Huber Loss Regression and Quantile Regression}
+\description{Efficient algorithms for fitting regularization paths for lasso or elastic-net penalized regression models with 
+  Huber loss, quantile loss or squared loss.}
 \details{
 \tabular{ll}{
 Package: \tab hqreg\cr
