@@ -180,10 +180,9 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
                 s[j] = (v1+v2*beta_old[j])/(l1*pf[j]);
                 beta[lp+j] = 0.0;
               }
-              // mark the first mismatch between beta and s
-	      if (!mismatch && pf[j] > 0) {
-                if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
-		   mismatch = 1;
+              // mismatch between beta and s
+	      if (pf[j] > 0) {
+                if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j]))) mismatch = 1;
               }
               // Update r, d1, d2 and compute candidate of max_update
               change = beta[lp+j]-beta_old[j];
@@ -414,8 +413,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               }
               // mismatch between beta and s
 	      if (pf[j] > 0) {
-                if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
-		  mismatch = 1;
+                if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j]))) mismatch = 1;
               }
 	      // Update r, d1, d2 and compute candidate of max_update
               change = beta[lp+j]-beta_old[j];
@@ -437,7 +435,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                 beta_old[j] = beta[lp+j];
               }
               //if(l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
-              if(!mismatch && update < thresh) break;
+              if (!mismatch && update < thresh) break;
             }
           }
         }
@@ -616,9 +614,8 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
                 beta[lp+j] = 0.0;
               }
               // mismatch between beta and s
-              if (!mismatch && pf[j] > 0) {
-                if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j])))
-                  mismatch = 1;
+              if (pf[j] > 0) {
+                if (fabs(s[j]) > 1 || (beta[lp+j] != 0 && s[j] != sign(beta[lp+j]))) mismatch = 1;
               }
               // Update residuals
               change = beta[lp+j]-beta_old[j];       
@@ -634,7 +631,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
           }
         }             
         // Check for convergence
-        if (!mismatch && max_update < thresh) {
+        if (max_update < thresh) {
           converged = 1;
           break;
         }
