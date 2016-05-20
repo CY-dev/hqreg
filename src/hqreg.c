@@ -106,8 +106,8 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     }
   }
   thresh = eps*nullDev;
-  if (message) Rprintf("threshold = %f\n", thresh);
   derivative_huber(d1, d2, r, gamma, n);
+  if (message) Rprintf("threshold = %f\nGamma = %f\n", thresh, gamma);
   
   // Set up lambda
   if (user == 0) {
@@ -117,6 +117,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
+    if (message) Rprintf("Lambda 1\n# iterations = %d\n", iter[0]);
     lstart = 1;
   } else {
     lstart = 0;
@@ -126,6 +127,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 
   // Solution path
   for (l=lstart; l<nlam; l++) {
+    if (message) Rprintf("Lambda %d\n", l+1);
     lp = l*p;
     l1 = lambda[l]*alpha;
     l2 = lambda[l]*(1.0-alpha);
@@ -228,7 +230,6 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 	      // pf[j] > 0
 	      // beta_old = beta = d = 0, no need for judgement
               s[j] = v1/(l1*pf[j]);
-              if (violations == 1 && message) Rprintf("Lambda %d\n", l+1);
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1) {
 	      v3 = fabs((v1-z[j])/(pf[j]*ldiff*alpha));
@@ -243,7 +244,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
           if (beta_old[j] != 0) nnzero++;
         }
       }
-      if (message) Rprintf("Lambda %d: # iterations = %d\n", l+1, iter[l]);
+      if (message) Rprintf("# iterations = %d\n", iter[l]);
       if (violations == 0) break;
       nv += violations;
     }
@@ -343,6 +344,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
+    if (message) Rprintf("Lambda 1\n# iterations = %d\n", iter[0]);
     lstart = 1;
   } else {
     lstart = 0;
@@ -477,7 +479,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           if (beta_old[j] != 0) nnzero++;
         }
       }
-      if (message) Rprintf("Lambda %d: # iterations = %d\n", l, iter[l]);
+      if (message) Rprintf("# iterations = %d\n", iter[l]);
       if (violations == 0) break;
       nv += violations;
     }
@@ -568,6 +570,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
+    if (message) Rprintf("Lambda 1\n# iterations = %d\n", iter[0]);
     lstart = 1;
   } else {
     lstart = 0;
@@ -577,6 +580,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   
   // Solution path
   for (l=lstart; l<nlam; l++) {
+    if (message) Rprintf("Lambda %d\n", l+1);
     lp = l*p;
     l1 = lambda[l]*alpha;
     l2 = lambda[l]*(1.0-alpha);
@@ -655,7 +659,6 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 	      // pf[j] > 0
 	      // beta_old = beta = d = 0, no need for judgement
               s[j] = v1/(l1*pf[j]);
-              if (violations == 1 && message) Rprintf("Lambda %d\n", l+1);
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1) {
 	      v3 = fabs((v1-z[j])/(pf[j]*ldiff*alpha));
@@ -671,6 +674,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
           if (beta_old[j] != 0) nnzero++;
         }
       }
+      if (message) Rprintf("# iterations = %d\n", iter[l]);
       if (violations == 0) break;
       nv += violations;
     }
@@ -733,9 +737,9 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
     }
   }
   thresh = eps*nullDev;
-  //if (message) Rprintf("threshold = %f\n", thresh);
   derivative_huber(d1, d2, r, gamma, n); 
-
+  if (message) Rprintf("threshold = %f\nGamma = %f\n", thresh, gamma);
+  
   // Set up lambda
   if (user == 0) {
     lambda[0] = maxprod(x, d1, n, p, pf)/n*10;
@@ -801,6 +805,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
       // Check for convergence
       if (max_update < thresh) break;
     }
+    if (message) Rprintf("Lambda %d: # iterations = %d\n", l+1, iter[l]);
   }
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nlam, p);
@@ -858,7 +863,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   gamma = ksav(r, n, m);
   if (gamma<0.001) gamma = 0.001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
-
+  if (message) Rprintf("threshold = %f\n", thresh);
   // Set up lambda
   if (user == 0) {
     lambda[0] = maxprod(x, d1, n, p, pf);
@@ -885,7 +890,6 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
     }
     if (gamma < 0.001) gamma = 0.001;
     gi = 1.0/gamma;
-    if (message) Rprintf("Lambda %d: Gamma = %f\n", l+1, gamma);
     lp = l*p;
     while(iter[l] < max_iter) {
       iter[l]++;
@@ -939,6 +943,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
       // Check for convergence
       if (max_update < thresh) break;
     }
+    if (message) Rprintf("Lambda %d: Gamma = %f, # iterations = %d\n", l+1, gamma, iter[l]);
   }
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nlam, p);
@@ -991,6 +996,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
     nullDev += pow(r[i],2); // without dividing by 2n
   }
   thresh = eps*nullDev;
+  if (message) Rprintf("threshold = %f\n", thresh);
   for (j=0; j<p; j++) {
     jn = j*n; temp = 0.0;
     for (i=0; i<n; i++) temp += x2[jn+i];
@@ -1038,6 +1044,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
       // Check for convergence
       if (max_update < thresh) break;
     }
+    if (message) Rprintf("Lambda %d: # iterations = %d\n", l+1, iter[l]);
   }
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nlam, p);
