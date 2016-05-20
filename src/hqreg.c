@@ -373,7 +373,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     l2 = lambda[l]*(1.0-alpha);
     // Variable screening
     if (scrflag != 0) {
-      if (scrfactor > 4.0) scrfactor = 4.0;
+      if (scrfactor > 3.0) scrfactor = 3.0;
       if (l == 0) {
       	cutoff = alpha*lambda[0];
       } else {
