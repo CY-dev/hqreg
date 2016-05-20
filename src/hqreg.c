@@ -106,13 +106,14 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     }
   }
   thresh = eps*nullDev;
-  derivative_huber(d1, d2, r, gamma, n);
   if (message) Rprintf("Threshold = %f\nGamma = %f\n", thresh, gamma);
+  
+  // Initial solution
+  derivative_huber(d1, d2, r, gamma, n);
+  init_huber(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, thresh, n, p, max_iter);
   
   // Set up lambda
   if (user == 0) {
-    // Initial solutions
-    init_huber(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, thresh, n, p, max_iter);
     lambda[0] = maxprod(x, d1, n, p, pf)/(n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
@@ -322,15 +323,16 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     nullDev += fabs(r[i]) + c*r[i];
   }
   thresh = eps*nullDev;
+  if (message) Rprintf("Threshold = %f\n", thresh);
+
+  // Initial solution
   gamma = ksav(r, n, m);
   if (gamma<0.001) gamma = 0.001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
-  if (message) Rprintf("Threshold = %f\n", thresh);
+  init_quantile(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, c, thresh, n, p, max_iter);
 
   // Set up lambda
   if (user == 0) {
-    // Find initial solutions for lambda[0]
-    init_quantile(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, c, thresh, n, p, max_iter);
     lambda[0] = maxprod(x, d1, n, p, pf);
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
@@ -562,11 +564,12 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     for (i=0; i<n; i++) temp += x2[jn+i];
     x2bar[j] = temp/n;
   }
+    
+  // Initial solution
+  init_squared(beta, beta_old, iter, x, x2bar, y, r, pf, thresh, n, p, ppflag, max_iter);
   
   // Set up lambda
   if (user == 0) {
-    // Find initial solutions for lambda[0]
-    init_squared(beta, beta_old, iter, x, x2bar, y, r, pf, thresh, n, p, ppflag, max_iter);
     lambda[0] = maxprod(x, r, n, p, pf)/(n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
@@ -865,6 +868,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   if (gamma<0.001) gamma = 0.001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
   if (message) Rprintf("Threshold = %f\n", thresh);
+  
   // Set up lambda
   if (user == 0) {
     lambda[0] = maxprod(x, d1, n, p, pf);
