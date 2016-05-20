@@ -240,7 +240,10 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 	  } else if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (message) Rprintf("Variable screening factor = %f\n", scrfactor);
+        if (message) {
+          if (violations) Rprintf("\n");
+          Rprintf("Variable screening factor = %f\n", scrfactor);
+        }
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
@@ -478,7 +481,10 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
           if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (message) Rprintf("Variable screening factor = %f\n", scrfactor);
+        if (message) {
+          if (violations) Rprintf("\n");
+          Rprintf("Variable screening factor = %f\n", scrfactor);
+        }
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
@@ -675,7 +681,10 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
           if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (message) Rprintf("Variable screening factor = %f\n", scrfactor);
+        if (message) {
+          if (violations) Rprintf("\n");
+          Rprintf("Variable screening factor = %f\n", scrfactor);
+        }
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
