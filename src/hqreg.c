@@ -233,13 +233,14 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               s[j] = v1/(l1*pf[j]);
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1) {
-	      v3 = fabs((v1-z[j])/(pf[j]*ldiff*alpha));
+	      v3 = fabs(v1-z[j]);
               if (v3 > scrfactor) scrfactor = v3;
 	    }
 	    z[j] = v1;
 	  } else if (beta_old[j] != 0) nnzero++;
         }
-        if (violations > 0 && message) Rprintf("\n");
+        scrfactor /= alpha*ldiff;
+        if (violations > 0 && message) Rprintf("scrfactor = %f\n", scrfactor);
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
