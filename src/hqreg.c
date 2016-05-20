@@ -134,7 +134,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     l2 = lambda[l]*(1.0-alpha);
     // Variable screening
     if (scrflag != 0) {
-      if (scrfactor > 5.0) scrfactor = 5.0;
+      if (scrfactor > 3.0) scrfactor = 3.0;
       if (l == 0) {
       	cutoff = alpha*lambda[0];
       } else {
