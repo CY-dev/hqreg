@@ -144,7 +144,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
       for (j=1; j<p; j++) {
         if(include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      scrfactor = 1.0; //reset scrfactor
+      scrfactor = 0.0; //reset scrfactor
     }
     while(iter[l] < max_iter) {
       // Check dfmax
