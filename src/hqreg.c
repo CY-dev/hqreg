@@ -57,7 +57,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double pct, lstep, ldiff, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  double pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
   double gi = 1.0/gamma; // 1/gamma as a multiplier
   double scrfactor = 1.0; // scaling factor used for screening rule
   int nnzero = 0; // number of nonzero variables
@@ -134,7 +134,6 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
       if (scrfactor > 5.0) scrfactor = 5.0;
       if (l == 0) {
       	cutoff = alpha*lambda[0];
-      	ldiff = 1.0;
       } else {
         cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
         ldiff = lambda[l-1] - lambda[l];
@@ -276,7 +275,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double gamma, gi, pct, lstep, ldiff, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh; 
+  double gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh; 
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double scrfactor = 1.0; // variable screening factor
   int nnzero = 0; // number of nonzero variables
@@ -368,7 +367,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       if (scrfactor > 5.0) scrfactor = 5.0;
       if (l == 0) {
       	cutoff = alpha*lambda[0];
-      	ldiff = 1.0;
       } else {
       	cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
         ldiff = lambda[l-1] - lambda[l];
@@ -512,7 +510,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double lstep, ldiff, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, scrfactor = 1.0;
+  double lstep, ldiff = 1.0, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, scrfactor = 1.0;
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -588,7 +586,6 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
       if (scrfactor > 5.0) scrfactor = 5.0;
       if (l == 0) {
       	cutoff = alpha*lambda[0];
-      	ldiff = 1.0;
       } else {
       	cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
         ldiff = lambda[l-1] - lambda[l];
