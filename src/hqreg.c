@@ -240,7 +240,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 	  } else if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (violations > 0 && message) Rprintf("scrfactor = %f\n", scrfactor);
+        if (message) Rprintf("scrfactor = %f\n", scrfactor);
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
