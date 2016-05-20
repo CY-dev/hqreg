@@ -78,7 +78,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   if (scrflag == 0) {
     for (j=0; j<p; j++) include[j] = 1;
   } else {
-    for (j=0; j<p; j++) if(pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
+    for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
   }
   int violations = 0, nv = 0; 
   
@@ -142,11 +142,11 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         ldiff = lambda[l-1] - lambda[l];
       }
       for (j=1; j<p; j++) {
-        if(include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
+        if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
       scrfactor = 0.0; //reset scrfactor
     }
-    while(iter[l] < max_iter) {
+    while (iter[l] < max_iter) {
       // Check dfmax
       if (nnzero > dfmax) {
         for (ll = l; ll<nlam; ll++) iter[ll] = NA_INTEGER;
@@ -155,7 +155,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
       }
 
       // Solve KKT equations on eligible predictors
-      while(iter[l] < max_iter) {
+      while (iter[l] < max_iter) {
         iter[l]++;
         max_update = 0.0;
         for (j=0; j<p; j++) {
@@ -210,7 +210,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
                 if (update > max_update) max_update = update;
                 beta_old[j] = beta[lp+j];
               }
-              //if(l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
+              //if (l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
               if (!mismatch && update < thresh) break;
             }
           }
@@ -383,7 +383,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       scrfactor = 0.0; //reset scrfactor
     }
     
-    while(iter[l] < max_iter) {
+    while (iter[l] < max_iter) {
       // Check dfmax
       if (nnzero > dfmax) {
         for (ll = l; ll<nlam; ll++) iter[ll] = NA_INTEGER;
@@ -392,7 +392,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       }
 
       // Solve KKT equations on eligible ones
-      while(iter[l] < max_iter) {
+      while (iter[l] < max_iter) {
         iter[l]++; max_update = 0.0;
         for (j=0; j<p; j++) {
           if (include[j]) {
@@ -447,7 +447,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                 if (update > max_update) max_update = update;
                 beta_old[j] = beta[lp+j];
               }
-              //if(l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
+              //if (l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
               if (!mismatch && update < thresh) break;
             }
           }
@@ -605,7 +605,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
       }
       scrfactor = 0.0; //reset scrfactor
     }
-    while(iter[l] < max_iter) {
+    while (iter[l] < max_iter) {
       // Check dfmax
       if (nnzero > dfmax) {
         for (ll = l; ll<nlam; ll++) iter[ll] = NA_INTEGER;
@@ -613,7 +613,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
         break;
       }
       // Solve KKT equations on eligible ones
-      while(iter[l] < max_iter) {
+      while (iter[l] < max_iter) {
         iter[l]++; max_update = 0.0;
         for (j=0; j<p; j++) {
           if (j == 0 && ppflag == 1) continue; // intercept is constant for standardized data
@@ -758,7 +758,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   // Solution path
   for (l=0; l<nlam; l++) {
     lp = l*p;
-    while(iter[l] < max_iter) {
+    while (iter[l] < max_iter) {
       iter[l]++;
       max_update = 0.0; 
       for (j=0; j<p; j++) {
@@ -899,7 +899,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
     if (gamma < 0.001) gamma = 0.001;
     gi = 1.0/gamma;
     lp = l*p;
-    while(iter[l] < max_iter) {
+    while (iter[l] < max_iter) {
       iter[l]++;
       max_update = 0.0; 
       for (j=0; j<p; j++) {
@@ -1022,7 +1022,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   // Solution path
   for (l=0; l<nlam; l++) {
     lp = l*p;
-    while(iter[l] < max_iter) {
+    while (iter[l] < max_iter) {
       iter[l]++;
       max_update = 0.0; 
       for (j=0; j<p; j++) {
