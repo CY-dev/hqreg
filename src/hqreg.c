@@ -10,9 +10,9 @@ double sign(double x);
 double crossprod(double *x, double *v, int n, int j);
 double maxprod(double *x, double *v, int n, int p, double *pf);
 double ksav(double *a, int size, int K);
-void standardize(double *x, double *x2, double *shift, double *scale, int n, int p);
-void rescale(double *x, double *x2, double *shift, double *scale, int n, int p);
-void postprocess(double *beta, double *shift, double *scale, int nlam, int p);
+void standardize(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p);
+void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p);
+void postprocess(double *beta, double *shift, double *scale, int *nonconst, int nlam, int p);
 void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2, 
 		double *y, double *r, double *pf, double *d1, double *d2, double gamma,
 		double thresh, int n, int p, int max_iter);
@@ -72,7 +72,8 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   double *d2 = Calloc(n, double);
   double *z = Calloc(p, double); // partial derivative used for screening: X^t*d1/n
   double cutoff;
-  int *include = Calloc(p, int); 
+  int *include = Calloc(p, int);
+  int *nonconst = Calloc(p, int);
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   if (scrflag == 0) {
@@ -84,9 +85,9 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   
   // Preprocessing
   if (ppflag == 1) {
-    standardize(x, x2, shift, scale, n, p);
+    standardize(x, x2, shift, scale, nonconst, n, p);
   } else if (ppflag == 2) {
-    rescale(x, x2, shift, scale, n, p);
+    rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
     for (j=1; j<p; j++) {
       jn = j*n;
@@ -257,7 +258,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   if (scrflag != 0 && message) Rprintf("# violations detected and fixed: %d\n", nv);
   numv[0] = nv;
   // Postprocessing
-  if (ppflag) postprocess(beta, shift, scale, nlam, p);
+  if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
   Free(x2);
   Free(shift);
@@ -269,6 +270,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   Free(d2);
   Free(z);
   Free(include);
+  Free(nonconst);
 }
 
 static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
@@ -297,6 +299,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double *z = Calloc(p, double); // partial derivative used for screening: X^t*d1/n
   double cutoff;
   int *include = Calloc(p, int);
+  int *nonconst = Calloc(p, int);
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   if (scrflag == 0) {
@@ -309,9 +312,9 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 
   // Preprocessing
   if (ppflag == 1) {
-    standardize(x, x2, shift, scale, n, p);
+    standardize(x, x2, shift, scale, nonconst, n, p);
   } else if (ppflag == 2) {
-    rescale(x, x2, shift, scale, n, p);
+    rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
     for (j=1; j<p; j++) {
       jn = j*n;
@@ -495,7 +498,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   if (scrflag != 0 && message) Rprintf("# KKT violations detected and fixed: %d\n", nv);
   numv[0] = nv;
   // Postprocessing
-  if (ppflag) postprocess(beta, shift, scale, nlam, p);
+  if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
   Free(x2);
   Free(shift);
@@ -508,6 +511,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   Free(d2);
   Free(z);
   Free(include);
+  Free(nonconst);
 }
 
 static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
@@ -533,6 +537,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   double *z = Calloc(p, double); // X^t * r/n
   double cutoff;
   int *include = Calloc(p, int);
+  int *nonconst = Calloc(p, int);
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   if (scrflag == 0) {
@@ -544,9 +549,9 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 
   // Preprocessing
   if (ppflag == 1) {
-    standardize(x, x2, shift, scale, n, p);
+    standardize(x, x2, shift, scale, nonconst, n, p);
   } else if (ppflag == 2) {
-    rescale(x, x2, shift, scale, n, p);
+    rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
     for (j=1; j<p; j++) {
       jn = j*n;
@@ -695,7 +700,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   if (scrflag != 0 && message) Rprintf("# KKT violations detected and fixed: %d\n", nv);
   numv[0] = nv;
   // Postprocessing
-  if (ppflag) postprocess(beta, shift, scale, nlam, p);
+  if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
   
   Free(x2);
   Free(x2bar);
@@ -705,6 +710,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   Free(r);
   Free(s);
   Free(include);
+  Free(nonconst);
 }
 
 // alpha = 0, pure l2 penalty
@@ -725,12 +731,13 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   double *r = Calloc(n, double);
   double *d1 = Calloc(n, double);
   double *d2 = Calloc(n, double);
+  int *nonconst = Calloc(p, int);
   
   // Preprocessing
   if (ppflag == 1) {
-    standardize(x, x2, shift, scale, n, p);
+    standardize(x, x2, shift, scale, nonconst, n, p);
   } else if (ppflag == 2) {
-    rescale(x, x2, shift, scale, n, p);
+    rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
     for (j=1; j<p; j++) {
       jn = j*n;
@@ -821,7 +828,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
     if (message) Rprintf("Lambda %d: # iterations = %d\n", l+1, iter[l]);
   }
   // Postprocessing
-  if (ppflag) postprocess(beta, shift, scale, nlam, p);
+  if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
   Free(x2);
   Free(shift);
@@ -830,6 +837,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   Free(r);
   Free(d1);
   Free(d2);
+  Free(nonconst);
 }
 
 static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
@@ -852,13 +860,14 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   double *d = Calloc(n, double);
   double *d1 = Calloc(n, double);
   double *d2 = Calloc(n, double);
+  int *nonconst = Calloc(p, int);
   int m = n/10 + 1;
 
   // Preprocessing
   if (ppflag == 1) {
-    standardize(x, x2, shift, scale, n, p);
+    standardize(x, x2, shift, scale, nonconst, n, p);
   } else if (ppflag == 2) {
-    rescale(x, x2, shift, scale, n, p);
+    rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
     for (j=1; j<p; j++) {
       jn = j*n;
@@ -960,7 +969,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
     if (message) Rprintf("Lambda %d: Gamma = %f, # iterations = %d\n", l+1, gamma, iter[l]);
   }
   // Postprocessing
-  if (ppflag) postprocess(beta, shift, scale, nlam, p);
+  if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
   
   Free(x2);
   Free(shift);
@@ -970,6 +979,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   Free(d);
   Free(d1);
   Free(d2);
+  Free(nonconst);
 }
 
 static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
@@ -990,12 +1000,13 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
   double *r = Calloc(n, double);
+  int *nonconst = Calloc(p, int);
   
   // Preprocessing
   if (ppflag == 1) {
-    standardize(x, x2, shift, scale, n, p);
+    standardize(x, x2, shift, scale, nonconst, n, p);
   } else if (ppflag == 2) {
-    rescale(x, x2, shift, scale, n, p);
+    rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
     for (j=1; j<p; j++) {
       jn = j*n;
@@ -1061,7 +1072,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
     if (message) Rprintf("Lambda %d: # iterations = %d\n", l+1, iter[l]);
   }
   // Postprocessing
-  if (ppflag) postprocess(beta, shift, scale, nlam, p);
+  if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
   Free(x2);
   Free(x2bar);
@@ -1069,6 +1080,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   Free(scale);
   Free(beta_old);
   Free(r);
+  Free(nonconst);
 }
 
 
