@@ -59,6 +59,24 @@ void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst,
   }
 }
 
+// simple processing with assignment of nonconst
+void simple_process(double *x, double *x2, int *nonconst, int n, int p) 
+{
+  int i, j, jn; double cmin, cmax;
+  for (j=1; j<p; j++) {
+    jn = j*n; cmin = x[jn]; cmax = x[jn];
+    for (i=1; i<n; i++) {
+      x2[jn+i] = pow(x[jn+i], 2);
+      if (x[jn+i] < cmin) {
+        cmin = x[jn+i];
+      } else if (x[jn+i] > cmax) {
+        cmax = x[jn+i];
+      }
+    }
+    if (cmax - cmin > 1e-6) nonconst[j] = 1;
+  }
+}
+
 // postprocess feature coefficients
 void postprocess(double *beta, double *shift, double *scale, int *nonconst, int nlam, int p) {
   int l, j, lp; double prod;
