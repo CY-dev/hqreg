@@ -8,7 +8,7 @@
 
 double sign(double x);
 double crossprod(double *x, double *v, int n, int j);
-double maxprod(double *x, double *v, int n, int p, double *pf);
+double maxprod(double *x, double *v, int n, int p, double *pf, int *nonconst);
 double ksav(double *a, int size, int K);
 void standardize(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p);
 void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p);
