@@ -14,17 +14,15 @@ double sign(double x) {
 }
 
 double crossprod(double *x, double *v, int n, int j) {
-  int jn = j*n, i;
-  double sum=0.0;
+  int jn = j*n, i; double sum=0.0;
   for (i=0;i<n;i++) sum += x[jn+i]*v[i];
   return(sum);
 }
 
-double maxprod(double *x, double *v, int n, int p, double *pf) {
-  int j;
-  double z, max=0.0;
+double maxprod(double *x, double *v, int n, int p, double *pf, int *nonconst) {
+  int j; double z, max=0.0;
   for (j=1; j<p; j++) {
-    if (pf[j]) {
+    if (pf[j] && nonconst[j]) {
       z = fabs(crossprod(x, v, n, j))/pf[j];
       if (z>max) max = z;
     }
