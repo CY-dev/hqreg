@@ -7,7 +7,7 @@
 #include "R_ext/Rdynload.h"
 
 // standardization for feature matrix
-void standardize(double *x, double *x2, double *shift, double *scale, int n, int p) 
+void standardize(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p) 
 {
   int i, j, jn; double xm, xsd, xvar;
   for (j=1; j<p; j++) {
@@ -21,17 +21,20 @@ void standardize(double *x, double *x2, double *shift, double *scale, int n, int
     }
     xvar /= n;
     xsd = sqrt(xvar);
-    for (i=0; i<n; i++) {
-      x[jn+i] = x[jn+i]/xsd;
-      x2[jn+i] = x2[jn+i]/xvar;
+    if (xsd > 1e-6) {
+      nonconst[j] = 1;
+      for (i=0; i<n; i++) {
+        x[jn+i] = x[jn+i]/xsd;
+        x2[jn+i] = x2[jn+i]/xvar;
+      }
+      shift[j] = xm;
+      scale[j] = xsd;
     }
-    shift[j] = xm;
-    scale[j] = xsd;
   }
 } 
 
 // rescaling for feature matrix
-void rescale(double *x, double *x2, double *shift, double *scale, int n, int p) 
+void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p) 
 {
   int i, j, jn; double cmin, cmax, crange;
   for (j=1; j<p; j++) {
@@ -44,17 +47,20 @@ void rescale(double *x, double *x2, double *shift, double *scale, int n, int p)
       }
     }
     crange = cmax - cmin;
-    for (i=0; i<n; i++) {
-      x[jn+i] = (x[jn+i]-cmin)/crange;
-      x2[jn+i] = pow(x[jn+i], 2);
+    if (crange > 1e-6) {
+      nonconst[j] = 1;
+      for (i=0; i<n; i++) {
+        x[jn+i] = (x[jn+i]-cmin)/crange;
+        x2[jn+i] = pow(x[jn+i], 2);
+      }
+      shift[j] = cmin;
+      scale[j] = crange;      
     }
-    shift[j] = cmin;
-    scale[j] = crange;
   }
 }
 
 // postprocess feature coefficients
-void postprocess(double *beta, double *shift, double *scale, int nlam, int p) {
+void postprocess(double *beta, double *shift, double *scale, int *nonconst, int nlam, int p) {
   int l, j, lp; double prod;
   for (l = 0; l<nlam; l++) {
     lp = l*p;
