@@ -31,6 +31,7 @@ void standardize(double *x, double *x2, double *shift, double *scale, int *nonco
       scale[j] = xsd;
     }
   }
+  nonconst[0] = 1;
 } 
 
 // rescaling for feature matrix
@@ -57,6 +58,7 @@ void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst,
       scale[j] = crange;      
     }
   }
+  nonconst[0] = 1;
 }
 
 // simple processing with assignment of nonconst
@@ -75,6 +77,7 @@ void simple_process(double *x, double *x2, int *nonconst, int n, int p)
     }
     if (cmax - cmin > 1e-6) nonconst[j] = 1;
   }
+  nonconst[0] = 1;
 }
 
 // postprocess feature coefficients
