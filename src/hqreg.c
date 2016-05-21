@@ -314,6 +314,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   } else {
     simple_process(x, x2, nonconst, n, p);
   }
+  for (j=1; j<p; j++) if (!nonconst[j]) Rprintf("nonconst[%d] = %d\n", j, nonconst[j]);
   
   include[0] = 1; // always include an intercept
   if (scrflag == 0) {
