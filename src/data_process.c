@@ -24,8 +24,8 @@ void standardize(double *x, double *x2, double *shift, double *scale, int *nonco
     if (xsd > 1e-6) {
       nonconst[j] = 1;
       for (i=0; i<n; i++) {
-        x[jn+i] = x[jn+i]/xsd;
-        x2[jn+i] = x2[jn+i]/xvar;
+        x[jn+i] /= xsd;
+        x2[jn+i] /= xvar;
       }
       shift[j] = xm;
       scale[j] = xsd;
@@ -66,8 +66,10 @@ void postprocess(double *beta, double *shift, double *scale, int *nonconst, int 
     lp = l*p;
     prod = 0.0;
     for (j = 1; j<p; j++) {
-      beta[lp+j] = beta[lp+j]/scale[j];
-      prod += shift[j]*beta[lp+j];
+      if (nonconst[j]) {
+        beta[lp+j] /= scale[j];
+        prod += shift[j]*beta[lp+j];
+      }
     }
     beta[lp] -= prod;
   }
