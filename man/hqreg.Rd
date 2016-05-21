@@ -5,7 +5,7 @@
 by lasso or elastic-net over a grid of values for the regularization parameter lambda.}
 \usage{
 hqreg(X, y, method = c("huber", "quantile", "ls"),
-    gamma, tau = 0.5, alpha = 1, nlambda = 100, lambda.min = 0.05, lambda, 
+    gamma = IQR(y)/10, tau = 0.5, alpha = 1, nlambda = 100, lambda.min = 0.05, lambda, 
     preprocess = c("standardize", "rescale", "none"), screen = c("ASR", "SR", "none"), 
     max.iter = 10000, eps = 1e-7, dfmax = ncol(X)+1, penalty.factor = rep(1, ncol(X)), 
     message = FALSE)
@@ -18,8 +18,7 @@ hqreg(X, y, method = c("huber", "quantile", "ls"),
     "quantile", or "ls" for least squares (see \code{Details}).}
   \item{gamma}{The tuning parameter of Huber loss, with no effect for the other loss 
     functions. Huber loss is quadratic for absolute values less than gamma and linear for those 
-    greater. If missing, the function uses a default value (5th percentile of the absolute
-    values of the centered response vector).}
+    greater than gamma. The default value is IQR(y)/10.}
   \item{tau}{The tuning parameter of the quantile loss, with no effect for the other loss 
     functions. It represents the conditional quantile of the response to be estimated, so 
     must be a number between 0 and 1. It includes the absolute loss when tau = 0.5 (default).}
