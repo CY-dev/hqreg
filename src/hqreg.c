@@ -360,7 +360,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     lstart = 0;
   }
 
-  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/n;
+  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/(2.0*n);
   
   // Solution path
   for (l=lstart; l<nlam; l++) {
