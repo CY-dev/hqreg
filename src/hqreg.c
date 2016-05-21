@@ -57,7 +57,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh;
+  double pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh;
   double gi = 1.0/gamma; // 1/gamma as a multiplier
   double scrfactor = 1.0; // scaling factor used for screening rule
   int nnzero = 0; // number of nonzero variables
@@ -98,11 +98,11 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   nullDev = 0.0; // not divided by n
   for (i=0; i<n; i++) {
     r[i] = y[i];
-    temp = fabs(r[i]);
-    if (temp > gamma) {
-      nullDev += temp - gamma/2;
+    tmp = fabs(r[i]);
+    if (tmp > gamma) {
+      nullDev += tmp - gamma/2;
     } else {
-      nullDev += temp*temp/(2*gamma);
+      nullDev += tmp*tmp/(2*gamma);
     }
   }
   thresh = eps*nullDev;
@@ -173,8 +173,8 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               if (pct < 0.05 || pct < 1.0/n) {
                 // approximate v2 with a continuation technique
                 for (i=0; i<n; i++) {
-                  temp = fabs(r[i]);
-                  if (temp > gamma) v2 += x2[jn+i]/temp;
+                  tmp = fabs(r[i]);
+                  if (tmp > gamma) v2 += x2[jn+i]/tmp;
                 }
               }
               v1 = v1/n; v2 = v2/n;
@@ -281,7 +281,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh; 
+  double gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh; 
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double scrfactor = 1.0; // variable screening factor
   int nnzero = 0; // number of nonzero variables
@@ -345,8 +345,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         d[i] = sign(r[i])+c;
       }
     }
-    temp = maxprod(x, d, n, p, pf);
-    if (temp > lambda[0]) lambda[0] = temp;
+    tmp = maxprod(x, d, n, p, pf);
+    if (tmp > lambda[0]) lambda[0] = tmp;
     lambda[0] = lambda[0]/(2*n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
@@ -362,8 +362,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   // Solution path
   for (l=lstart; l<nlam; l++) {
     if (gamma > 0.001) {
-      temp = ksav(r, n, m);
-      if (temp < gamma) gamma = temp;
+      tmp = ksav(r, n, m);
+      if (tmp < gamma) gamma = tmp;
     }
     if (gamma < 0.001) gamma = 0.001;
     gi = 1.0/gamma;
@@ -412,8 +412,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	      if (pct < 0.07 || pct < 1.0/n) {
 	        // approximate v2 with a continuation technique
 	        for (i=0; i<n; i++) {
-	      	  temp = fabs(r[i]);
-		  if (temp > gamma) v2 += x2[jn+i]/temp;
+	      	  tmp = fabs(r[i]);
+		  if (tmp > gamma) v2 += x2[jn+i]/tmp;
                 }
 	      }
 	      v1 = v1/(2.0*n); v2 = v2/(2.0*n);
@@ -522,7 +522,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double lstep, ldiff = 1.0, l1, l2, v1, v2, v3, temp, change, nullDev, max_update, update, thresh, scrfactor = 1.0;
+  double lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh, scrfactor = 1.0;
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -568,9 +568,9 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 
   for (j=0; j<p; j++) {
     jn = j*n;
-    temp = 0.0;
-    for (i=0; i<n; i++) temp += x2[jn+i];
-    x2bar[j] = temp/n;
+    tmp = 0.0;
+    for (i=0; i<n; i++) tmp += x2[jn+i];
+    x2bar[j] = tmp/n;
   }
     
   // Initial solution
@@ -719,7 +719,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
-  double gi = 1.0/gamma, pct, lstep, v1, v2, temp, change, nullDev, max_update, update, thresh;
+  double gi = 1.0/gamma, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
@@ -745,11 +745,11 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   nullDev = 0.0; // not divided by n
   for (i=0;i<n;i++) {
     r[i] = y[i];
-    temp = fabs(r[i]);
-    if (temp > gamma) {
-      nullDev += temp - gamma/2;
+    tmp = fabs(r[i]);
+    if (tmp > gamma) {
+      nullDev += tmp - gamma/2;
     } else {
-      nullDev += temp*temp/(2*gamma);
+      nullDev += tmp*tmp/(2*gamma);
     }
   }
   thresh = eps*nullDev;
@@ -784,8 +784,8 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
           if (pct < 0.05 || pct < 1.0/n) {
             // approximate v2 with a continuation technique
             for (i=0; i<n; i++) {
-              temp = fabs(r[i]);
-              if (temp > gamma) v2 += x2[jn+i]/temp;
+              tmp = fabs(r[i]);
+              if (tmp > gamma) v2 += x2[jn+i]/tmp;
             }
           }
           v1 = v1/n; v2 = v2/n;
@@ -844,7 +844,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
-  double gamma, gi, pct, lstep, v1, v2, temp, change, nullDev, max_update, update, thresh;
+  double gamma, gi, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -891,8 +891,8 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
         d[i] = sign(r[i])+c;
       } 
     }
-    temp = maxprod(x, d, n, p, pf);
-    if (temp > lambda[0]) lambda[0] = temp;
+    tmp = maxprod(x, d, n, p, pf);
+    if (tmp > lambda[0]) lambda[0] = tmp;
     lambda[0] = lambda[0]/(2*n)*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
@@ -902,8 +902,8 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   // Solution path
   for (l=0; l<nlam; l++) {
     if (gamma > 0.001 && l > 0) {
-      temp = ksav(r, n, m);
-      if (temp < gamma) gamma = temp;
+      tmp = ksav(r, n, m);
+      if (tmp < gamma) gamma = tmp;
     }
     if (gamma < 0.001) gamma = 0.001;
     gi = 1.0/gamma;
@@ -925,8 +925,8 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
           if (pct < 0.07 || pct < 1.0/n) {
 	    // approximate v2 with a continuation technique
             for (i=0; i<n; i++) {
-	      temp = fabs(r[i]);
-	      if (temp > gamma) v2 += x2[jn+i]/temp;
+	      tmp = fabs(r[i]);
+	      if (tmp > gamma) v2 += x2[jn+i]/tmp;
 	    }
 	  }
           v1 = v1/(2.0*n); v2 = v2/(2.0*n);
@@ -984,7 +984,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
-  double lstep, v1, v2, temp, change, nullDev, max_update, update, thresh;
+  double lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *x2bar = Calloc(p, double); // Col Mean of x2
@@ -1015,9 +1015,9 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   thresh = eps*nullDev;
   if (message) Rprintf("Threshold = %f\n", thresh);
   for (j=0; j<p; j++) {
-    jn = j*n; temp = 0.0;
-    for (i=0; i<n; i++) temp += x2[jn+i];
-    x2bar[j] = temp/n;
+    jn = j*n; tmp = 0.0;
+    for (i=0; i<n; i++) tmp += x2[jn+i];
+    x2bar[j] = tmp/n;
   }
 
   // Set up lambda
