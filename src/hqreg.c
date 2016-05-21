@@ -60,6 +60,8 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   double pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh;
   double gi = 1.0/gamma; // 1/gamma as a multiplier
   double scrfactor = 1.0; // scaling factor used for screening rules
+  //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
+  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -74,13 +76,6 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   double cutoff;
   int *include = Calloc(p, int);
   int *nonconst = Calloc(p, int);
-  //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
-  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
-  if (scrflag == 0) {
-    for (j=0; j<p; j++) include[j] = 1;
-  } else {
-    for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
-  }
   int violations = 0, nv = 0; 
   
   // Preprocessing
@@ -95,6 +90,13 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     }
   }
 
+  include[0] = 1; // always include an intercept
+  if (scrflag == 0) {
+    for (j=1; j<p; j++) if (nonconst[j]) include[j] = 1;
+  } else {
+    for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
+  }
+  
   // Initialization
   nullDev = 0.0; // not divided by n
   for (i=0; i<n; i++) {
@@ -285,6 +287,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh; 
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double scrfactor = 1.0; // variable screening factor
+  //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
+  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -300,13 +304,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double cutoff;
   int *include = Calloc(p, int);
   int *nonconst = Calloc(p, int);
-  //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
-  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
-  if (scrflag == 0) {
-    for (j=0; j<p; j++) include[j] = 1;
-  } else {
-    for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
-  }
   int violations = 0, nv = 0;
   int m = n/10 + 1;
 
@@ -321,7 +318,14 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       for (i=0; i<n; i++) x2[jn+i]=pow(x[jn+i],2);
     }
   }
-
+  
+  include[0] = 1; // always include an intercept
+  if (scrflag == 0) {
+    for (j=1; j<p; j++) if (nonconst[j]) include[j] = 1;
+  } else {
+    for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
+  }
+  
   // Initialization
   nullDev = 0.0; // not divided by n
   for (i=0;i<n;i++) {
@@ -523,7 +527,10 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  double lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh, scrfactor = 1.0;
+  double lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh;
+  double scrfactor = 1.0; // variable screening factor
+  //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
+  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -538,13 +545,6 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   double cutoff;
   int *include = Calloc(p, int);
   int *nonconst = Calloc(p, int);
-  //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
-  // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
-  if (scrflag == 0) {
-    for (j=0; j<p; j++) include[j] = 1;
-  } else {
-    for (j=0; j<p; j++) if (pf[j] == 0.0) include[j] = 1; // include unpenalized coefficients
-  }
   int violations = 0, nv = 0;
 
   // Preprocessing
@@ -557,6 +557,13 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
       jn = j*n;
       for (i=0; i<n; i++) x2[jn+i]=pow(x[jn+i],2);
     }
+  }
+  
+  include[0] = 1; // always include an intercept
+  if (scrflag == 0) {
+    for (j=1; j<p; j++) if (nonconst[j]) include[j] = 1;
+  } else {
+    for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
   }
   
   // Initialize r, z and assign x2bar, nullDev
