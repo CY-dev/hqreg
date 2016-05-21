@@ -59,7 +59,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
   double pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh;
   double gi = 1.0/gamma; // 1/gamma as a multiplier
-  double scrfactor = 1.0; // scaling factor used for screening rule
+  double scrfactor = 1.0; // scaling factor used for screening rules
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
@@ -144,7 +144,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
       for (j=1; j<p; j++) {
         if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      scrfactor = 0.0; //reset scrfactor
+      if (scrflag == 1) scrfactor = 0.0; //reset scrfactor for ASR
     }
     while (iter[l] < max_iter) {
       // Check dfmax
@@ -153,7 +153,6 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         saturated[0] = 1;
         break;
       }
-
       // Solve KKT equations on eligible predictors
       while (iter[l] < max_iter) {
         iter[l]++;
@@ -383,9 +382,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       for (j=1; j<p; j++) {
         if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      scrfactor = 0.0; //reset scrfactor
+      if (scrflag == 1) scrfactor = 0.0; //reset scrfactor for ASR
     }
-    
     while (iter[l] < max_iter) {
       // Check dfmax
       if (nnzero > dfmax) {
@@ -393,7 +391,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         saturated[0] = 1;
         break;
       }
-
       // Solve KKT equations on eligible ones
       while (iter[l] < max_iter) {
         iter[l]++; max_update = 0.0;
@@ -609,7 +606,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
       for (j=1; j<p; j++) {
         if (include[j] == 0 && fabs(z[j]) > (cutoff * pf[j])) include[j] = 1;
       }
-      scrfactor = 0.0; //reset scrfactor
+      if (scrflag == 1) scrfactor = 0.0; //reset scrfactor for ASR
     }
     while (iter[l] < max_iter) {
       // Check dfmax
