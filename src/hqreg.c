@@ -590,7 +590,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     lstart = 0;
   }
   
-  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/n;
+  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, r, n, j)/n;
   
   // Solution path
   for (l=lstart; l<nlam; l++) {
