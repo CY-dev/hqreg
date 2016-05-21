@@ -59,8 +59,10 @@ plot(cv)
 predict(cv, X[1:5,])
 
 # parallel cross validation
+\dontrun{
 cv = cv.hqreg(X, y, ncores = 5)
 plot(cv)
+}
 }
 \keyword{models}
 \keyword{regression}
