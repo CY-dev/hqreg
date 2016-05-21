@@ -115,7 +115,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   
   // Set up lambda
   if (user == 0) {
-    lambda[0] = maxprod(x, d1, n, p, pf)/(n*alpha);
+    lambda[0] = maxprod(x, d1, n, p, pf, nonconst)/(n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -339,7 +339,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 
   // Set up lambda
   if (user == 0) {
-    lambda[0] = maxprod(x, d1, n, p, pf);
+    lambda[0] = maxprod(x, d1, n, p, pf, nonconst);
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
         d[i] = c;
@@ -347,7 +347,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
         d[i] = sign(r[i])+c;
       }
     }
-    tmp = maxprod(x, d, n, p, pf);
+    tmp = maxprod(x, d, n, p, pf, nonconst);
     if (tmp > lambda[0]) lambda[0] = tmp;
     lambda[0] = lambda[0]/(2*n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
@@ -580,7 +580,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   
   // Set up lambda
   if (user == 0) {
-    lambda[0] = maxprod(x, r, n, p, pf)/(n*alpha);
+    lambda[0] = maxprod(x, r, n, p, pf, nonconst)/(n*alpha);
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -762,7 +762,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   
   // Set up lambda
   if (user == 0) {
-    lambda[0] = maxprod(x, d1, n, p, pf)/n*10;
+    lambda[0] = maxprod(x, d1, n, p, pf, nonconst)/n*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
@@ -889,7 +889,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   
   // Set up lambda
   if (user == 0) {
-    lambda[0] = maxprod(x, d1, n, p, pf);
+    lambda[0] = maxprod(x, d1, n, p, pf, nonconst);
     for (i=0; i<n; i++) {
       if (fabs(r[i]) < 1e-10) {
         d[i] = c;
@@ -897,7 +897,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
         d[i] = sign(r[i])+c;
       } 
     }
-    tmp = maxprod(x, d, n, p, pf);
+    tmp = maxprod(x, d, n, p, pf, nonconst);
     if (tmp > lambda[0]) lambda[0] = tmp;
     lambda[0] = lambda[0]/(2*n)*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
@@ -1030,7 +1030,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
 
   // Set up lambda
   if (user == 0) {
-    lambda[0] = maxprod(x, r, n, p, pf)/n*10;
+    lambda[0] = maxprod(x, r, n, p, pf, nonconst)/n*10;
     if (lambda_min == 0.0) lambda_min = 0.001;
     lstep = log(lambda_min)/(nlam - 1);
     for (l=1; l<nlam; l++) lambda[l] = lambda[l-1]*exp(lstep);
