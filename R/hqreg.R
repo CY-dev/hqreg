@@ -21,21 +21,13 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma = IQR(y)/1
   
   shift <- 0
   if (method == "huber") {
-    if(missing(gamma)) {
-      shift <- mean(y)
-      yy <- y-shift
-      gamma <- quantile(abs(yy), 0.1)
-    } else {
-      shift <- if(gamma > sd(y)) mean(y) else median(y)
-      yy <- y-shift
-    }
+    shift <- if(gamma > sd(y)) mean(y) else median(y)
   } else if (method == "ls") {
     shift <- mean(y)
-    yy <- y-shift
   } else if (method == "quantile") {
     shift <- quantile(y, tau)
-    yy <- y-shift
   }
+  yy <- y - shift
   
   # Flag for user-supplied lambda
   user <- 0
