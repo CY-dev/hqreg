@@ -197,7 +197,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               if (fabs(change) > 1e-6) {
                 for (i=0; i<n; i++) {
 		  r[i] -= x[jn+i]*change;
-                  if (fabs(r[i])>gamma) {
+                  if (fabs(r[i]) > gamma) {
                     d1[i] = sign(r[i]);
                     d2[i] = 0.0;
                   } else {
@@ -225,7 +225,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 	  if (include[j] == 0 && nonconst[j]) {
             v1 = crossprod(x, d1, n, j)/n;
 	    // Check for KKT conditions
-	    if (fabs(v1)>l1*pf[j]) { 
+	    if (fabs(v1) > l1*pf[j]) { 
 	      include[j]=1; 
 	      violations++;
 	      // pf[j] > 0
