@@ -15,13 +15,13 @@ void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst,
 void simple_process(double *x, double *x2, int *nonconst, int n, int p);
 void postprocess(double *beta, double *shift, double *scale, int *nonconst, int nlam, int p);
 void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2, 
-		double *y, double *r, double *pf, double *d1, double *d2, double gamma,
-		double thresh, int n, int p, int max_iter);
+		double *y, double *r, double *pf, double *d1, double *d2, int *nonconst, 
+		double gamma, double thresh, int n, int p, int max_iter);
 void init_quantile(double *beta, double *beta_old, int *iter, double *x, double *x2, 
-		   double *y, double *r, double *pf, double *d1, double *d2, double gamma,
-		   double c, double thresh, int n, int p, int max_iter);
-void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, 
-		  double *r, double *pf, double thresh, int n, int p, int ppflag, int max_iter);
+		   double *y, double *r, double *pf, double *d1, double *d2, int *nonconst,
+		   double gamma, double c, double thresh, int n, int p, int max_iter);
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, double *r, 
+                  double *pf, int *nonconst, double thresh, int n, int p, int ppflag, int max_iter);
 
 void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
   double gi = 1.0/gamma;
@@ -111,7 +111,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   
   // Initial solution
   derivative_huber(d1, d2, r, gamma, n);
-  init_huber(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, thresh, n, p, max_iter);
+  init_huber(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, nonconst, gamma, thresh, n, p, max_iter);
   
   // Set up lambda
   if (user == 0) {
@@ -336,7 +336,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   gamma = ksav(r, n, m);
   if (gamma<0.001) gamma = 0.001;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
-  init_quantile(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, gamma, c, thresh, n, p, max_iter);
+  init_quantile(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, nonconst, gamma, c, thresh, n, p, max_iter);
 
   // Set up lambda
   if (user == 0) {
@@ -577,7 +577,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   }
     
   // Initial solution
-  init_squared(beta, beta_old, iter, x, x2bar, y, r, pf, thresh, n, p, ppflag, max_iter);
+  init_squared(beta, beta_old, iter, x, x2bar, y, r, pf, nonconst, thresh, n, p, ppflag, max_iter);
   
   // Set up lambda
   if (user == 0) {
