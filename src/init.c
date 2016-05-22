@@ -11,15 +11,15 @@ double crossprod(double *x, double *v, int n, int j);
 
 // Fit the initial solutions for unpenalized features in elastic-net penalized models
 void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2, 
-		double *y, double *r, double *pf, double *d1, double *d2, double gamma, 
-		double thresh, int n, int p, int max_iter)
+		double *y, double *r, double *pf, double *d1, double *d2, int *nonconst, 
+		double gamma, double thresh, int n, int p, int max_iter)
 {
   double gi = 1.0/gamma, v1, v2, pct, temp, change, max_update, update; int i, j, k, jn;
   while(iter[0]<max_iter) {
     iter[0]++;
     max_update = 0.0;
     for (j=0; j<p; j++) {
-      if (pf[j] == 0.0) { // unpenalized
+      if (pf[j] == 0.0 && nonconst[j]) { // unpenalized
         for (k=0; k<5; k++) {
           update = 0.0;
           // Calculate v1, v2
@@ -67,8 +67,8 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
 }
 
 void init_quantile(double *beta, double *beta_old, int *iter, double *x, double *x2, 
-		   double *y, double *r, double *pf, double *d1, double *d2, double gamma, 
-		   double c, double thresh, int n, int p, int max_iter)
+		   double *y, double *r, double *pf, double *d1, double *d2, int *nonconst, 
+		   double gamma, double c, double thresh, int n, int p, int max_iter)
 {
   double gi = 1.0/gamma, v1, v2, pct, temp, change, max_update, update; 
   int i, j, k, jn, num_unpenalized = 0;
@@ -79,7 +79,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
     iter[0]++;
     max_update = 0.0;
     for (j=0; j<p; j++) {
-      if (pf[j] == 0.0) { // unpenalized
+      if (pf[j] == 0.0 && nonconst[j]) { // unpenalized
         for (k=0; k<5; k++) {
           update = 0.0;
           // Calculate v1, v2
@@ -126,8 +126,8 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
   }
 }
 
-void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, 
-		  double *r, double *pf, double thresh, int n, int p, int ppflag, int max_iter)
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, double *r, 
+                  double *pf, int *nonconst, double thresh, int n, int p, int ppflag, int max_iter)
 {
   double v1, v2, change, max_update, update; int i, j, k, jn;
   while(iter[0]<max_iter) {
@@ -135,7 +135,7 @@ void init_squared(double *beta, double *beta_old, int *iter, double *x, double *
     max_update = 0.0;
     for (j=0; j<p; j++) {
       if (j == 0 && ppflag == 1) continue; // intercept is constant for standardized data
-      if (pf[j] == 0.0) { // unpenalized
+      if (pf[j] == 0.0 && nonconst[j]) { // unpenalized
         for (k=0; k<5; k++) {
           update = 0.0;
           // Calculate v1, v2
