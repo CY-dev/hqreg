@@ -15,7 +15,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
 		double gamma, double thresh, int n, int p, int max_iter)
 {
   double gi = 1.0/gamma, v1, v2, pct, temp, change, max_update, update; int i, j, k, jn;
-  while(iter[0]<max_iter) {
+  while (iter[0] < max_iter) {
     iter[0]++;
     max_update = 0.0;
     for (j=0; j<p; j++) {
@@ -45,7 +45,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
           if (fabs(change) > 1e-6) {
             for (i=0; i<n; i++) {
               r[i] -= x[jn+i]*change;
-              if (fabs(r[i])>gamma) {
+              if (fabs(r[i]) > gamma) {
                 d1[i] = sign(r[i]);
                 d2[i] = 0.0;
               } else {
@@ -54,7 +54,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
               }
             }
             update = n*v2*change*change;
-            if (update>max_update) max_update = update;
+            if (update > max_update) max_update = update;
             beta_old[j] = beta[j];
           }
           if (update < thresh) break;
@@ -73,9 +73,9 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
   double gi = 1.0/gamma, v1, v2, pct, temp, change, max_update, update; 
   int i, j, k, jn, num_unpenalized = 0;
   // return when only intercept is unpenalized since intercept = quantile(y, tau) = 0
-  for (j=1; j<p; j++) if(pf[j] == 0.0) num_unpenalized++;
+  for (j=1; j<p; j++) if (pf[j] == 0.0) num_unpenalized++;
   if (num_unpenalized == 0) return;
-  while(iter[0]<max_iter) {
+  while (iter[0] < max_iter) {
     iter[0]++;
     max_update = 0.0;
     for (j=0; j<p; j++) {
@@ -105,7 +105,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
           if (fabs(change) > 1e-6) {
             for (i=0; i<n; i++) {
               r[i] -= x[jn+i]*change;
-              if (fabs(r[i])>gamma) {
+              if (fabs(r[i]) > gamma) {
                 d1[i] = sign(r[i])+c;
                 d2[i] = 0.0;
               } else {
@@ -114,7 +114,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
               }
             }
             update = n*v2*change*change;
-            if (update>max_update) max_update = update;
+            if (update > max_update) max_update = update;
             beta_old[j] = beta[j];
           }
           if (update < thresh) break;
@@ -130,7 +130,7 @@ void init_squared(double *beta, double *beta_old, int *iter, double *x, double *
                   double *pf, int *nonconst, double thresh, int n, int p, int ppflag, int max_iter)
 {
   double v1, v2, change, max_update, update; int i, j, k, jn;
-  while(iter[0]<max_iter) {
+  while (iter[0] < max_iter) {
     iter[0]++;
     max_update = 0.0;
     for (j=0; j<p; j++) {
@@ -148,7 +148,7 @@ void init_squared(double *beta, double *beta_old, int *iter, double *x, double *
             jn = j*n;
             for (i=0; i<n; i++) r[i] -= x[jn+i]*change;
             update = n*v2*change*change;
-            if (update>max_update) max_update = update;
+            if (update > max_update) max_update = update;
             beta_old[j] = beta[j];
           }
           if (update < thresh) break;
