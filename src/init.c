@@ -126,7 +126,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
   }
 }
 
-void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, double *r, 
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2m, double *y, double *r, 
                   double *pf, int *nonconst, double thresh, int n, int p, int ppflag, int max_iter)
 {
   double v1, v2, change, max_update, update; int i, j, k, jn;
@@ -139,7 +139,7 @@ void init_squared(double *beta, double *beta_old, int *iter, double *x, double *
         for (k=0; k<5; k++) {
           update = 0.0;
           // Calculate v1, v2
-      	  v1 = crossprod(x, r, n, j)/n; v2 = x2bar[j];
+      	  v1 = crossprod(x, r, n, j)/n; v2 = x2m[j];
           // Update beta_j
           beta[j] = beta_old[j] + v1/v2; 
           // Update r and compute candidate of max_update
