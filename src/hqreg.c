@@ -20,7 +20,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
 void init_quantile(double *beta, double *beta_old, int *iter, double *x, double *x2, 
 		   double *y, double *r, double *pf, double *d1, double *d2, int *nonconst,
 		   double gamma, double c, double thresh, int n, int p, int max_iter);
-void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2bar, double *y, double *r, 
+void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2m, double *y, double *r, 
                   double *pf, int *nonconst, double thresh, int n, int p, int ppflag, int max_iter);
 
 void derivative_huber(double *d1, double *d2, double *r, double gamma, int n) {
@@ -184,7 +184,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               } else if (fabs(beta_old[j]+s[j]) > 1.0) { // active
                 s[j] = sign(beta_old[j]+s[j]);
                 beta[lp+j] = beta_old[j] + (v1-l1*pf[j]*s[j]-l2*pf[j]*beta_old[j])/(v2+l2*pf[j]); 
-              } else {
+              } else { // inactive
                 s[j] = (v1+v2*beta_old[j])/(l1*pf[j]);
                 beta[lp+j] = 0.0;
               }
@@ -205,12 +205,10 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
               	    d2[i] = gi;
                   }
                 }
-                //v2 += n*l2*pf[j];
                 update = (v2+l2*pf[j])*change*change*n;
                 if (update > max_update) max_update = update;
                 beta_old[j] = beta[lp+j];
               }
-              //if (l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
               if (!mismatch && update < thresh) break;
             }
           }
@@ -223,13 +221,12 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
       if (scrflag != 0) {
         for (j=0; j<p; j++) {
 	  if (include[j] == 0 && nonconst[j]) {
+	    // pf[j] > 0, beta_old = beta = s = 0
             v1 = crossprod(x, d1, n, j)/n;
 	    // Check for KKT conditions
 	    if (fabs(v1) > l1*pf[j]) { 
 	      include[j]=1; 
 	      violations++;
-	      // pf[j] > 0
-	      // beta_old = beta = d = 0, no need for judgement
               s[j] = v1/(l1*pf[j]);
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1) {
@@ -241,10 +238,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 	  if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (message) {
-          if (violations) Rprintf("\n");
-          Rprintf("Variable screening factor = %f\n", scrfactor);
-        }
+        if (message && violations > 0) Rprintf("\n");
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
@@ -254,7 +248,6 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
       if (violations == 0) break;
       nv += violations;
     }
-    //Rprintf("iter[%d] = %d, beta[0] = %f\n", l+1, iter[l], beta[l*p]);
   }
   if (scrflag != 0 && message) Rprintf("# violations detected and fixed: %d\n", nv);
   numv[0] = nv;
@@ -424,7 +417,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
               } else if (fabs(beta_old[j]+s[j]) > 1.0) { // active
                 s[j] = sign(beta_old[j]+s[j]);
                 beta[lp+j] = beta_old[j] + (v1-l1*pf[j]*s[j]-l2*pf[j]*beta_old[j])/(v2+l2*pf[j]);
-              } else {
+              } else { // inactive
                 s[j] = (v1+v2*beta_old[j])/(l1*pf[j]);
                 beta[lp+j] = 0.0;
               }
@@ -435,7 +428,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	      // Update r, d1, d2 and compute candidate of max_update
               change = beta[lp+j]-beta_old[j];
               if (fabs(change) > 1e-6) {
-	        //v2 = 0.0;
                 for (i=0; i<n; i++) {
 		  r[i] -= x[jn+i]*change;
                   if (fabs(r[i]) > gamma) {
@@ -444,14 +436,12 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                   } else {
 		    d1[i] = r[i]*gi+c;
 		    d2[i] = gi;
-	            //v2 += x2[jn+i]*d2[i];
 	          }
 	        }
                 update = (v2+l2*pf[j])*change*change*n*4.0;
                 if (update > max_update) max_update = update;
                 beta_old[j] = beta[lp+j];
               }
-              //if (l == 76) Rprintf("pct = %3.2f, beta[%d] = %lf, s = %2.1f, mismatch = %d, change = %lf\n", pct, j, beta[lp+j], s[j], mismatch, change);
               if (!mismatch && update < thresh) break;
             }
           }
@@ -464,13 +454,12 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       if (scrflag != 0) {
         for (j=0; j<p; j++) {
 	  if (include[j] == 0 && nonconst[j]) {
+	    // pf[j] > 0, beta_old = beta = s = 0
             v1 = crossprod(x, d1, n, j)/(2*n);
 	    // Check for KKT conditions
 	    if (fabs(v1) > l1*pf[j]) { 
 	      include[j]=1; 
 	      violations++;
-	      // pf[j] > 0
-	      // beta_old = beta = d = 0, no need for judgement
               s[j] = v1/(l1*pf[j]);
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1) {
@@ -482,10 +471,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 	  if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (message) {
-          if (violations) Rprintf("\n");
-          Rprintf("Variable screening factor = %f\n", scrfactor);
-        }
+        if (message && violations > 0) Rprintf("\n");
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
@@ -531,8 +517,8 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
-  double *x2bar = Calloc(p, double); // Col Mean of x2
-  x2bar[0] = 1.0;
+  double *x2m = Calloc(p, double); // Column means of x2
+  x2m[0] = 1.0;
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -560,7 +546,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
   }
   
-  // Initialize r, z and assign x2bar, nullDev
+  // Initialize r, z and assign x2m, nullDev
   nullDev = 0.0;
   for (i=0; i<n; i++) {
     r[i] = y[i];
@@ -573,11 +559,11 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     jn = j*n;
     tmp = 0.0;
     for (i=0; i<n; i++) tmp += x2[jn+i];
-    x2bar[j] = tmp/n;
+    x2m[j] = tmp/n;
   }
     
   // Initial solution
-  init_squared(beta, beta_old, iter, x, x2bar, y, r, pf, nonconst, thresh, n, p, ppflag, max_iter);
+  init_squared(beta, beta_old, iter, x, x2m, y, r, pf, nonconst, thresh, n, p, ppflag, max_iter);
   
   // Set up lambda
   if (user == 0) {
@@ -629,15 +615,15 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
           if (include[j]) {
             for (k=0; k<5; k++) {
               update = 0.0; mismatch = 0;
-	      // Update v1=z[j], v2=x2bar[j]
-              v1 = crossprod(x, r, n, j)/n; v2 = x2bar[j];
+	      // Update v1=z[j], v2=x2m[j]
+              v1 = crossprod(x, r, n, j)/n; v2 = x2m[j];
               // Update beta_j
               if (pf[j] == 0.0) { // unpenalized
                 beta[lp+j] = beta_old[j] + v1/v2;
               } else if (fabs(beta_old[j]+s[j]) > 1.0) { // active
                 s[j] = sign(beta_old[j]+s[j]);
                 beta[lp+j] = beta_old[j] + (v1-l2*pf[j]*beta_old[j]-l1*pf[j]*s[j])/(v2+l2*pf[j]);
-              } else {
+              } else { // inactive
                 s[j] = (v1+v2*beta_old[j])/(l1*pf[j]);
                 beta[lp+j] = 0.0;
               }
@@ -666,13 +652,12 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
       if (scrflag != 0) {
         for (j=0; j<p; j++) {
 	  if (include[j] == 0 && nonconst[j]) {
+	    // pf[j] > 0, beta_old = beta = s = 0
             v1 = crossprod(x, r, n, j)/n;
 	    // Check for KKT conditions
 	    if (fabs(v1) > l1*pf[j]) {
 	      include[j]=1; 
 	      violations++;
-	      // pf[j] > 0
-	      // beta_old = beta = d = 0, no need for judgement
               s[j] = v1/(l1*pf[j]);
               if (message) Rprintf("+V%d", j);
 	    } else if (scrflag == 1) {
@@ -684,10 +669,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 	  if (beta_old[j] != 0) nnzero++;
         }
         scrfactor /= alpha*ldiff;
-        if (message) {
-          if (violations) Rprintf("\n");
-          Rprintf("Variable screening factor = %f\n", scrfactor);
-        }
+        if (message && violations > 0) Rprintf("\n");
       } else {
         for (j=0; j<p; j++) {
           if (beta_old[j] != 0) nnzero++;
@@ -704,7 +686,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
   
   Free(x2);
-  Free(x2bar);
+  Free(x2m);
   Free(shift);
   Free(scale);
   Free(beta_old);
@@ -801,7 +783,6 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
             // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
             if (fabs(change) > 1e-6) {
-              //v2 = 0.0;
               for (i=0; i<n; i++) {
                 r[i] -= x[jn+i]*change;
                 if (fabs(r[i]) > gamma) {
@@ -810,10 +791,8 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
                 } else {
                   d1[i] = r[i]*gi;
                   d2[i] = gi;
-                  //v2 += x2[jn+i]*d2[i];
                 }
               }
-              //v2 += n*lambda[l]*pf[j];
               update = (v2+lambda[l]*pf[j])*change*change*n;
               if (update > max_update) max_update = update;
               beta_old[j] = beta[lp+j];
@@ -943,7 +922,6 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
             // Update r, d1, d2 and compute candidate of max_update
             change = beta[lp+j]-beta_old[j];
             if (fabs(change) > 1e-6) {
-              //v2 = 0.0;
               for (i=0; i<n; i++) {
                 r[i] -= x[jn+i]*change;
                 if (fabs(r[i]) > gamma) {
@@ -993,8 +971,8 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   double lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
   for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
-  double *x2bar = Calloc(p, double); // Col Mean of x2
-  x2bar[0] = 1.0; 
+  double *x2m = Calloc(p, double); // Column means of x2
+  x2m[0] = 1.0; 
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -1021,7 +999,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   for (j=0; j<p; j++) {
     jn = j*n; tmp = 0.0;
     for (i=0; i<n; i++) tmp += x2[jn+i];
-    x2bar[j] = tmp/n;
+    x2m[j] = tmp/n;
   }
 
   // Set up lambda
@@ -1043,8 +1021,8 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
         if (nonconst[j]) {
       	  for (k=0; k<5; k++) {
             update = 0.0;
-            // Update v1, v2=x2bar[j]
-            v1 = crossprod(x, r, n, j)/n; v2 = x2bar[j];
+            // Update v1, v2=x2m[j]
+            v1 = crossprod(x, r, n, j)/n; v2 = x2m[j];
             // Update beta_j
             if (pf[j] == 0.0) { // unpenalized
               beta[lp+j] = beta_old[j] + v1/v2;
@@ -1073,7 +1051,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
   Free(x2);
-  Free(x2bar);
+  Free(x2m);
   Free(shift);
   Free(scale);
   Free(beta_old);
