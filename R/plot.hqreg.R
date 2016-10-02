@@ -2,7 +2,7 @@ plot.hqreg <- function(x, xvar = c("lambda", "norm"), log.l = TRUE, nvars = TRUE
 {
   xvar <- match.arg(xvar)
   nonzero <- which(rowSums(abs(x$beta))!=0)
-  Y <- x$beta[nonzero[-1],]
+  Y <- x$beta[nonzero[-1],,drop = FALSE]
   p <- nrow(Y)
   if (xvar == "lambda") {
     X <- x$lambda
