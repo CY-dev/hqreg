@@ -1,8 +1,13 @@
 plot.hqreg <- function(x, xvar = c("lambda", "norm"), log.l = TRUE, nvars = TRUE, alpha = 1, ...)
 {
   xvar <- match.arg(xvar)
-  nonzero <- which(rowSums(abs(x$beta))!=0)
-  Y <- x$beta[nonzero[-1],,drop = FALSE]
+  if (nrow(x$beta) == length(x$penalty.factor)) { // no intercept
+    Y <- x$beta[,,drop = FALSE]
+  } else {
+    Y <- x$beta[-1,,drop = FALSE]
+  }
+  nonzero <- which(rowSums(abs(Y))!=0)
+  Y <- Y[nonzero,,drop = FALSE]
   p <- nrow(Y)
   if (xvar == "lambda") {
     X <- x$lambda
