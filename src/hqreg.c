@@ -12,7 +12,7 @@ double maxprod(double *x, double *v, int n, int p, double *pf, int *nonconst);
 double ksav(double *a, int size, int K);
 void standardize(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p);
 void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p);
-void simple_process(double *x, double *x2, int *nonconst, int n, int p);
+void simple_process(double *x, double *x2, int *nonconst, int n, int p, int intercept);
 void postprocess(double *beta, double *shift, double *scale, int *nonconst, int nlam, int p);
 void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2, 
 		double *y, double *r, double *pf, double *d1, double *d2, int *nonconst, 
@@ -51,11 +51,11 @@ void derivative_quantapprox(double *d1, double *d2, double *r, double gamma, dou
 // Semismooth Newton Coordinate Descent (SNCD)
 static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
 		       double *pf, double *gamma_, double *alpha_, double *eps_, double *lambda_min_, int *nlam_, 
-		       int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
+		       int *n_, int *p_, int *ppflag_, int *scrflag_, int *intercept_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double gamma = gamma_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
-  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
+  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0]; int intercept = intercept_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
   double pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh;
@@ -65,7 +65,6 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
-  for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -85,14 +84,13 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   } else if (ppflag == 2) {
     rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
-    simple_process(x, x2, nonconst, n, p);
+    simple_process(x, x2, nonconst, n, p, intercept);
   }
 
-  include[0] = 1; // always include an intercept
   if (scrflag == 0) {
-    for (j=1; j<p; j++) if (nonconst[j]) include[j] = 1;
+    for (j=0; j<p; j++) if (nonconst[j]) include[j] = 1;
   } else {
-    for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
+    for (j=0; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
   }
   
   // Initialization
@@ -125,7 +123,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
     lstart = 0;
   }
 
-  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/n;
+  for (j=0; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/n;
 
   // Solution path
   for (l=lstart; l<nlam; l++) {
@@ -142,7 +140,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
         cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
         ldiff = lambda[l-1] - lambda[l];
       }
-      for (j=1; j<p; j++) {
+      for (j=0; j<p; j++) {
         if (include[j] == 0 && nonconst[j] && fabs(z[j]) > cutoff * pf[j]) include[j] = 1;
       }
       if (scrflag == 1) scrfactor = 0.0; //reset scrfactor for ASR
@@ -269,11 +267,11 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
 
 static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
 			  double *pf, double *tau_, double *alpha_, double *eps_, double *lambda_min_, int *nlam_, 
-			  int *n_, int *p_, int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
+			  int *n_, int *p_, int *ppflag_, int *scrflag_, int *intercept_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double tau = tau_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
-  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
+  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0]; int intercept = intercept_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
   double gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh; 
@@ -283,7 +281,6 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
-  for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double);
@@ -305,15 +302,13 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   } else if (ppflag == 2) {
     rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
-    simple_process(x, x2, nonconst, n, p);
+    simple_process(x, x2, nonconst, n, p, intercept);
   }
-  for (j=1; j<p; j++) if (!nonconst[j]) Rprintf("nonconst[%d] = %d\n", j, nonconst[j]);
   
-  include[0] = 1; // always include an intercept
   if (scrflag == 0) {
-    for (j=1; j<p; j++) if (nonconst[j]) include[j] = 1;
+    for (j=0; j<p; j++) if (nonconst[j]) include[j] = 1;
   } else {
-    for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
+    for (j=0; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
   }
   
   // Initialization
@@ -353,7 +348,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
     lstart = 0;
   }
 
-  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/(2.0*n);
+  for (j=0; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, d1, n, j)/(2.0*n);
   
   // Solution path
   for (l=lstart; l<nlam; l++) {
@@ -376,7 +371,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       	cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
         ldiff = lambda[l-1] - lambda[l];
       }
-      for (j=1; j<p; j++) {
+      for (j=0; j<p; j++) {
         if (include[j] == 0 && nonconst[j] && fabs(z[j]) > cutoff * pf[j]) include[j] = 1;
       }
       if (scrflag == 1) scrfactor = 0.0; //reset scrfactor for ASR
@@ -503,11 +498,11 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 
 static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
 			 double *pf, double *alpha_, double *eps_, double *lambda_min_, int *nlam_, int *n_, int *p_, 
-			 int *ppflag_, int *scrflag_, int *dfmax_, int *max_iter_, int *user_, int *message_)
+			 int *ppflag_, int *scrflag_, int *intercept_, int *dfmax_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
-  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0];
+  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0]; int intercept = intercept_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, ll, lp, jn, lstart, mismatch; 
   double lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh;
@@ -516,9 +511,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
   double *x2 = Calloc(n*p, double); // x^2
-  for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *x2m = Calloc(p, double); // Column means of x2
-  x2m[0] = 1.0;
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -536,14 +529,13 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   } else if (ppflag == 2) {
     rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
-    simple_process(x, x2, nonconst, n, p);
+    simple_process(x, x2, nonconst, n, p, intercept);
   }
   
-  include[0] = 1; // always include an intercept
   if (scrflag == 0) {
-    for (j=1; j<p; j++) if (nonconst[j]) include[j] = 1;
+    for (j=0; j<p; j++) if (nonconst[j]) include[j] = 1;
   } else {
-    for (j=1; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
+    for (j=0; j<p; j++) if (pf[j] == 0.0 && nonconst[j]) include[j] = 1; // unpenalized coefficients
   }
   
   // Initialize r, z and assign x2m, nullDev
@@ -577,7 +569,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
     lstart = 0;
   }
   
-  for (j=1; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, r, n, j)/n;
+  for (j=0; j<p; j++) if (pf[j] && nonconst[j]) z[j] = crossprod(x, r, n, j)/n;
   
   // Solution path
   for (l=lstart; l<nlam; l++) {
@@ -595,7 +587,7 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
       	cutoff = alpha*((1.0+scrfactor)*lambda[l] - scrfactor*lambda[l-1]);
         ldiff = lambda[l-1] - lambda[l];
       }
-      for (j=1; j<p; j++) {
+      for (j=0; j<p; j++) {
         if (include[j] == 0 && nonconst[j] && fabs(z[j]) > cutoff * pf[j]) include[j] = 1;
       }
       if (scrflag == 1) scrfactor = 0.0; //reset scrfactor for ASR
@@ -698,16 +690,15 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
 
 // alpha = 0, pure l2 penalty
 static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, double *gamma_, double *eps_, 
-			  double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *max_iter_, int *user_, int *message_)
+			  double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, int *intercept_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double gamma = gamma_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
-  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
+  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int intercept = intercept_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
   double gi = 1.0/gamma, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
-  for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -722,7 +713,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   } else if (ppflag == 2) {
     rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
-    simple_process(x, x2, nonconst, n, p);
+    simple_process(x, x2, nonconst, n, p, intercept);
   }
 
   // Initialization
@@ -821,17 +812,16 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
 
 static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
 			     double *tau_, double *eps_, double *lambda_min_, int *nlam_, int *n_, int *p_, 
-			     int *ppflag_, int *max_iter_, int *user_, int *message_)
+			     int *ppflag_, int *intercept_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double tau = tau_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
-  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
+  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int intercept = intercept_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
   double gamma, gi, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double *x2 = Calloc(n*p, double); // x^2
-  for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -848,7 +838,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   } else if (ppflag == 2) {
     rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
-    simple_process(x, x2, nonconst, n, p);
+    simple_process(x, x2, nonconst, n, p, intercept);
   }
 
   // Initialization
@@ -961,18 +951,16 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
 
 static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
 			    double *eps_, double *lambda_min_, int *nlam_, int *n_, int *p_, int *ppflag_, 
-                            int *max_iter_, int *user_, int *message_)
+                            int *intercept_, int *max_iter_, int *user_, int *message_)
 {
   // Declarations
   double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
-  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0];
+  int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int intercept = intercept_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
   double lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double *x2 = Calloc(n*p, double); // x^2
-  for (i=0; i<n; i++) x2[i] = 1.0; // column of 1's for intercept
   double *x2m = Calloc(p, double); // Column means of x2
-  x2m[0] = 1.0; 
   double *shift = Calloc(p, double);
   double *scale = Calloc(p, double);
   double *beta_old = Calloc(p, double); 
@@ -985,7 +973,7 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   } else if (ppflag == 2) {
     rescale(x, x2, shift, scale, nonconst, n, p);
   } else {
-    simple_process(x, x2, nonconst, n, p);
+    simple_process(x, x2, nonconst, n, p, intercept);
   }
   
   // Initialization
@@ -1061,12 +1049,12 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
 
 
 static const R_CMethodDef cMethods[] = {
-  {"huber", (DL_FUNC) &sncd_huber, 21},
-  {"quant", (DL_FUNC) &sncd_quantile, 21},
-  {"squared", (DL_FUNC) &sncd_squared, 20},
-  {"huber_l2", (DL_FUNC) &sncd_huber_l2, 16},
-  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 16},
-  {"squared_l2", (DL_FUNC) &sncd_squared_l2, 15},
+  {"huber", (DL_FUNC) &sncd_huber, 22},
+  {"quant", (DL_FUNC) &sncd_quantile, 22},
+  {"squared", (DL_FUNC) &sncd_squared, 21},
+  {"huber_l2", (DL_FUNC) &sncd_huber_l2, 17},
+  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 17},
+  {"squared_l2", (DL_FUNC) &sncd_squared_l2, 16},
   {NULL}
 };
 
