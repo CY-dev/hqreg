@@ -4,7 +4,7 @@
 \description{For raw data with no preprocessing fit solution paths for Huber loss regression or quantile regression penalized 
 by lasso or elastic-net over a grid of values for the regularization parameter lambda.}
 \usage{
-hqreg(X, y, method = c("huber", "quantile", "ls"),
+hqreg_raw(X, y, method = c("huber", "quantile", "ls"),
     gamma = IQR(y)/10, tau = 0.5, alpha = 1, nlambda = 100, lambda.min = 0.05, lambda, 
     intercept = TRUE, screen = c("ASR", "SR", "none"), 
     max.iter = 10000, eps = 1e-7, dfmax = ncol(X)+1, penalty.factor = rep(1, ncol(X)), 
@@ -100,7 +100,7 @@ coef(fit1, 0.01)
 predict(fit1, X[1:5,], lambda = c(0.02, 0.01))
 
 # no intercept
-fit2 = hqreg(X, y, intercept = TRUE)
+fit2 = hqreg_raw(X, y, intercept = FALSE)
 plot(fit2)
 
 \keyword{models}
