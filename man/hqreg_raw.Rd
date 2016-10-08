@@ -1,8 +1,8 @@
 \name{hqreg_raw}
 \alias{hqreg_raw}
-\title{On raw data fit a robust regression model with Huber or quantile loss penalized by lasso or elasti-net}
-\description{On raw data fit solution paths for Huber loss regression or quantile regression penalized 
-by lasso or elastic-net over a grid of values for the regularization parameter lambda.}
+\title{Fit a robust regression model on raw data with Huber or quantile loss penalized by lasso or elasti-net}
+\description{On raw data without internal data preprocessing, fit solution paths for Huber loss regression or 
+quantile regression penalized by lasso or elastic-net over a grid of values for the regularization parameter lambda.}
 \usage{
 hqreg_raw(X, y, method = c("huber", "quantile", "ls"),
     gamma = IQR(y)/10, tau = 0.5, alpha = 1, nlambda = 100, lambda.min = 0.05, lambda, 
