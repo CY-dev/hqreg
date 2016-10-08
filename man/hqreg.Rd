@@ -6,7 +6,7 @@ by lasso or elastic-net over a grid of values for the regularization parameter l
 \usage{
 hqreg(X, y, method = c("huber", "quantile", "ls"),
     gamma = IQR(y)/10, tau = 0.5, alpha = 1, nlambda = 100, lambda.min = 0.05, lambda, 
-    preprocess = c("standardize", "rescale", "none"), screen = c("ASR", "SR", "none"), 
+    preprocess = c("standardize", "rescale"), screen = c("ASR", "SR", "none"), 
     max.iter = 10000, eps = 1e-7, dfmax = ncol(X)+1, penalty.factor = rep(1, ncol(X)), 
     message = FALSE)
 }
@@ -36,7 +36,7 @@ hqreg(X, y, method = c("huber", "quantile", "ls"),
     \code{predict} instead after fitting the solution path with \code{hqreg} or performing 
     k-fold CV with \code{cv.hqreg}.}
   \item{preprocess}{Preprocessing technique to be applied to the input. Either 
-    "standardize" (default), "rescale" or "none" (see \code{Details}). The coefficients 
+    "standardize" (default) or "rescale"(see \code{Details}). The coefficients 
     are always returned on the original scale.}
   \item{screen}{Screening rule to be applied at each \code{lambda} that discards variables 
     for speed. Either "ASR" (default), "SR" or "none". "SR" stands for the strong rule, 
@@ -75,7 +75,7 @@ hqreg(X, y, method = c("huber", "quantile", "ls"),
   for \code{preprocess = "rescale"}, 
   \deqn{x' = \frac{x-min(x)}{max(x)-min(x)}.}{x' = (x-min(x))/(max(x)-min(x)).}
   The models are fit with preprocessed input, then the coefficients are transformed back
-  to the original scale via some algebra.
+  to the original scale via some algebra. To fit a model for raw data with no preprocessing, use \code{hqreg_raw}.
 }
 
 \value{
