@@ -18,3 +18,8 @@
   	* removed computational redundancy and reduced memory allocation in source code
 	* corrected typos in documentation
 
+1.3-2
+  	* new function "hqreg_raw" for fitting models on raw data without preprocessing
+	* hqreg_raw: include an argument "intercept" that allows a "no-intercept" fit by setting intercept = FALSE
+	* hqreg: no longer support preprocess = "none" since the package now has a specific function hqreg_raw for that situation
+	* modify plot, predict function accordingly for the situation without an intercept
