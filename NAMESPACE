@@ -1,5 +1,5 @@
 useDynLib(hqreg, .registration=TRUE)
-export(hqreg, cv.hqreg)
+export(hqreg, hqreg_raw, cv.hqreg)
 importFrom(graphics, plot)
 S3method(plot, hqreg)
 S3method(plot, cv.hqreg)
