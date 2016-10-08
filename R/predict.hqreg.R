@@ -13,7 +13,7 @@ predict.hqreg <- function(object, X, lambda, type=c("response","coefficients","n
       b <- beta[-1]
     }
     if (type == "nvars") {
-      if (is.matrix(beta)) return(apply(b!=0, 2, sum))
+      if (is.matrix(b)) return(apply(b!=0, 2, sum))
       else return(sum(b!=0))
     }
     if (type == "response") return(sweep(X %*% b, 2, b0, "+"))
