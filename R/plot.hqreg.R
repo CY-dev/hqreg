@@ -39,7 +39,7 @@ plot.hqreg <- function(x, xvar = c("lambda", "norm"), log.l = TRUE, nvars = TRUE
   do.call("matlines",line.args)
   abline(h=0)
   if (nvars) {
-    nv = predict(x$fit, lambda = x$lambda, type = "nvars")
+    nv = predict(x, lambda = x$lambda, type = "nvars")
     axis(3, at=X, labels=nv, tick=FALSE, line=-0.5)
   }
 }
