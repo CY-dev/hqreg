@@ -10,6 +10,7 @@
 void standardize(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p) 
 {
   int i, j, jn; double xm, xsd, xvar;
+  for (i=0; i<n; i++) x2[i] = 1.0;
   for (j=1; j<p; j++) {
     jn = j*n; xm = 0.0; xsd = 0.0; xvar = 0.0; 
     for (i=0; i<n; i++) xm += x[jn+i];
@@ -38,6 +39,7 @@ void standardize(double *x, double *x2, double *shift, double *scale, int *nonco
 void rescale(double *x, double *x2, double *shift, double *scale, int *nonconst, int n, int p) 
 {
   int i, j, jn; double cmin, cmax, crange;
+  for (i=0; i<n; i++) x2[i] = 1.0;
   for (j=1; j<p; j++) {
     jn = j*n; cmin = x[jn]; cmax = x[jn];
     for (i=0; i<n; i++) {
@@ -66,6 +68,7 @@ void simple_process(double *x, double *x2, int *nonconst, int n, int p, int inte
 {
   int i, j, jstart, jn; double cmin, cmax;
   if (intercept) {
+    for (i=0; i<n; i++) x2[i] = 1.0;
     nonconst[0] = 1;
     jstart = 1;
   } else {
