@@ -1,5 +1,5 @@
 hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma = IQR(y)/10, tau = 0.5, alpha=1, nlambda=100, lambda.min = 0.05, lambda, 
-                   preprocess = c("standardize", "rescale", "none"),  screen = c("ASR", "SR", "none"), max.iter = 10000, eps = 1e-7, 
+                   preprocess = c("standardize", "rescale"),  screen = c("ASR", "SR", "none"), max.iter = 10000, eps = 1e-7, 
                    dfmax = ncol(X)+1, penalty.factor=rep(1, ncol(X)), message = FALSE) {
   
   # Error checking
@@ -39,22 +39,22 @@ hqreg <- function (X, y, method = c("huber", "quantile", "ls"), gamma = IQR(y)/1
   }
   
   # Flags for preprocessing and screening
-  ppflag = switch(preprocess, standardize = 1, rescale = 2, none = 0)
-  scrflag = switch(screen, ASR = 1, SR = 2, none = 0)
+  ppflag = switch(preprocess, standardize = 1L, rescale = 2L)
+  scrflag = switch(screen, ASR = 1L, SR = 2L, none = 0L)
   # Fitting
   if (alpha > 0) {
     if (method == "huber") {
       fit <- .C("huber", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
-                as.integer(scrflag), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
+                as.integer(scrflag), 1L, as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     } else if (method == "quantile") {
       fit <- .C("quant", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(tau), as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), 
-                as.integer(ppflag), as.integer(scrflag), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
+                as.integer(ppflag), as.integer(scrflag), 1L, as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     } else {
       fit <- .C("squared", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag), as.integer(scrflag),
-                as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
+                1L, as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     }
     beta <- matrix(fit[[1]],nrow = p)
     iter <- fit[[2]]
