@@ -23,7 +23,7 @@ plot.cv.hqreg <- function(x, log.l = TRUE, nvars = TRUE, ...)
   suppressWarnings(arrows(x0=l[ind], x1=l[ind], y0=L[ind], y1=U[ind], code=3, angle=90, col="gray80", length=.03))
   points(l, y, col="red", pch=19, cex=.5)
   if (nvars) {
-    n.s <- apply(coef(x$fit, lambda=x$lambda)!=0, 2, sum)-1
-    axis(3, at=l, labels=n.s, tick=FALSE, line=-0.5)
+    nv <- predict(x$fit, lambda = x$lambda, type = "nvars")
+    axis(3, at=l, labels=nv, tick=FALSE, line=-0.5)
   }
 }
