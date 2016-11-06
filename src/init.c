@@ -38,7 +38,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
             }
           }
           v1 = v1/n; v2 = v2/n;
-	  if (j == 0) Rprintf("v1 = %f, v2 = %f\n", v1, v2);
+	  Rprintf("v1 = %f, v2 = %f\n", v1, v2);
           // Update beta_j
           beta[j] = beta_old[j] + v1/v2; 
           // Update r, d1, d2 and compute candidate of max_update
@@ -65,6 +65,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
     // Check for convergence
     if (max_update < thresh) break;
   }
+  for (j = 0; j < p; j++) Rprintf("beta[%d] = %f, ", j, beta[j]);
 }
 
 void init_quantile(double *beta, double *beta_old, int *iter, double *x, double *x2, 
@@ -125,7 +126,6 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
     // Check for convergence
     if (max_update < thresh) break;
   }
-  for (j = 0; j < p; j++) Rprintf("beta[%d] = %f, ", j, beta[j]);
 }
 
 void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2m, double *y, double *r, 
