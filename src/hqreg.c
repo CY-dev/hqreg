@@ -168,7 +168,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
                 pct += d2[i];
               }
 	      pct *= gamma/n; // percentage of residuals with absolute values below gamma
-              if (pct < 0.05 || pct < 1.0/n) {
+              if (pct < 0.05 || pct < 1.0/n || v2 == 0.0) {
                 // approximate v2 with a continuation technique
                 for (i=0; i<n; i++) {
                   tmp = fabs(r[i]);
@@ -399,7 +399,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
                 pct += d2[i];
               }
 	      pct *= gamma/n; // percentage of residuals with absolute values below gamma
-	      if (pct < 0.07 || pct < 1.0/n) {
+	      if (pct < 0.07 || pct < 1.0/n || v2 == 0.0) {
 	        // approximate v2 with a continuation technique
 	        for (i=0; i<n; i++) {
 	      	  tmp = fabs(r[i]);
@@ -758,7 +758,7 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
               pct += d2[i];
             }
             pct *= gamma/n; // percentage of residuals with absolute values below gamma
-            if (pct < 0.05 || pct < 1.0/n) {
+            if (pct < 0.05 || pct < 1.0/n || v2 == 0.0) {
               // approximate v2 with a continuation technique
               for (i=0; i<n; i++) {
                 tmp = fabs(r[i]);
@@ -896,7 +896,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
               pct += d2[i];
             }
             pct *= gamma/n; // percentage of residuals with absolute values below gamma
-            if (pct < 0.07 || pct < 1.0/n) {
+            if (pct < 0.07 || pct < 1.0/n || v2 == 0.0) {
               // approximate v2 with a continuation technique
               for (i=0; i<n; i++) {
                 tmp = fabs(r[i]);
