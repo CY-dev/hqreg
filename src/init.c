@@ -30,7 +30,7 @@ void init_huber(double *beta, double *beta_old, int *iter, double *x, double *x2
             pct += d2[i];
           }
           pct = pct*gamma/n; // percentage of residuals with absolute values below gamma
-          if (pct < 0.05 || pct < 1.0/n) {
+          if (pct < 0.05 || pct < 1.0/n || v2 == 0.0) {
 	    // approximate v2 with a continuation technique
             for (i=0; i<n; i++) {
               temp = fabs(r[i]);
