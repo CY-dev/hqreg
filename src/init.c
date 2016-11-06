@@ -125,6 +125,7 @@ void init_quantile(double *beta, double *beta_old, int *iter, double *x, double 
     // Check for convergence
     if (max_update < thresh) break;
   }
+  for (j = 0; j < p; j++) Rprintf("beta[%d] = %f, ", j, beta[j]);
 }
 
 void init_squared(double *beta, double *beta_old, int *iter, double *x, double *x2m, double *y, double *r, 
