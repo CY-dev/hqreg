@@ -176,6 +176,7 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
                 }
               }
               v1 /= n; v2 /= n;
+	      if(j == 0) Rprintf("v1 = %f, v2 = %f\n", v1, v2);
               // Update beta_j
               if (pf[j] == 0.0) { // unpenalized
 	        beta[lp+j] = beta_old[j] + v1/v2; 
