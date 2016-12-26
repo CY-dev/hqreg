@@ -273,10 +273,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   double tau = tau_[0]; double alpha = alpha_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int scrflag = scrflag_[0]; int intercept = intercept_[0];
   int dfmax = dfmax_[0]; int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, ll, lp, jn, lstart, mismatch; 
-  //if (tau >= 0.1 && tau <= 0.9) m = n/10 + 1;
-  //else m = n/50+1;
-  double gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh; 
+  int m, i, j, k, l, ll, lp, jn, lstart, mismatch; 
+  double lo, gamma, gi, pct, lstep, ldiff = 1.0, l1, l2, v1, v2, v3, tmp, change, nullDev, max_update, update, thresh; 
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double scrfactor = 1.0; // variable screening factor
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
@@ -296,8 +294,13 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   int *include = Calloc(p, int);
   int *nonconst = Calloc(p, int);
   int violations = 0, nv = 0;
-  double lo = (tau >= 0.05 && tau <= 0.95)? 0.001 : 0.0001;
-  int m = (tau >= 0.05 && tau <= 0.95)? (n/10 + 1) : (n/50 + 1);
+  if (tau >= 0.05 && tau <= 0.95) {
+      m = n/10 + 1;
+      lo = 0.001;
+  } else {
+      m = n/50 + 1;
+      lo = 0.0001;
+  }
   // Preprocessing
   if (ppflag == 1) {
     standardize(x, x2, shift, scale, nonconst, n, p);
