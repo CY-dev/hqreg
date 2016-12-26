@@ -823,8 +823,8 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   double tau = tau_[0]; double eps = eps_[0]; double lambda_min = lambda_min_[0]; 
   int nlam = nlam_[0]; int n = n_[0]; int p = p_[0]; int ppflag = ppflag_[0]; int intercept = intercept_[0];
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
-  int i, j, k, l, lp, jn; 
-  double gamma, gi, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
+  int m, i, j, k, l, lp, jn; 
+  double lo, gamma, gi, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
   double *x2 = Calloc(n*p, double); // x^2
   double *shift = Calloc(p, double);
@@ -835,8 +835,14 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   double *d1 = Calloc(n, double);
   double *d2 = Calloc(n, double);
   int *nonconst = Calloc(p, int);
-  int m = n/10 + 1;
-
+  if (tau >= 0.05 && tau <= 0.95) {
+      m = n/10 + 1;
+      lo = 0.001;
+  } else {
+      m = n/100 + 1;
+      lo = 0.0001;
+  }
+  
   // Preprocessing
   if (ppflag == 1) {
     standardize(x, x2, shift, scale, nonconst, n, p);
@@ -854,7 +860,7 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   }
   thresh = eps*nullDev;
   gamma = ksav(r, n, m);
-  if (gamma<0.001) gamma = 0.001;
+  if (gamma < lo) gamma = lo;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
   if (message) Rprintf("Threshold = %f\n", thresh);
   
@@ -878,11 +884,11 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
 
   // Solution path
   for (l=0; l<nlam; l++) {
-    if (gamma > 0.001 && l > 0) {
+    if (gamma > lo && l > 0) {
       tmp = ksav(r, n, m);
       if (tmp < gamma) gamma = tmp;
     }
-    if (gamma < 0.001) gamma = 0.001;
+    if (gamma < lo) gamma = lo;
     gi = 1.0/gamma;
     lp = l*p;
     while (iter[l] < max_iter) {
