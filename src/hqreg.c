@@ -298,7 +298,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       m = n/10 + 1;
       lo = 0.001;
   } else {
-      m = n/50 + 1;
+      m = n/100 + 1;
       lo = 0.0001;
   }
   // Preprocessing
