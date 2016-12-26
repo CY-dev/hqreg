@@ -299,7 +299,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
       lo = 0.001;
   } else {
       m = n/50 + 1;
-      lo = 0.00001;
+      lo = 0.0001;
   }
   // Preprocessing
   if (ppflag == 1) {
