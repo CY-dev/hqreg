@@ -296,7 +296,8 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   int *include = Calloc(p, int);
   int *nonconst = Calloc(p, int);
   int violations = 0, nv = 0;
-  int m = (tau >= 0.1 && tau <= 0.9)? (n/10 + 1) : (n/50 + 1);
+  double lo = (tau >= 0.05 && tau <= 0.95)? 0.001 : 0.0001;
+  int m = (tau >= 0.05 && tau <= 0.95)? (n/10 + 1) : (n/50 + 1);
   // Preprocessing
   if (ppflag == 1) {
     standardize(x, x2, shift, scale, nonconst, n, p);
@@ -323,7 +324,7 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
 
   // Initial solution
   gamma = ksav(r, n, m);
-  if (gamma<0.001) gamma = 0.001;
+  if (gamma < lo) gamma = lo;
   derivative_quantapprox(d1, d2, r, gamma, c, n);
   init_quantile(beta, beta_old, iter, x, x2, y, r, pf, d1, d2, nonconst, gamma, c, thresh, n, p, max_iter);
 
@@ -353,11 +354,11 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   
   // Solution path
   for (l=lstart; l<nlam; l++) {
-    if (gamma > 0.001) {
+    if (gamma > lo) {
       tmp = ksav(r, n, m);
       if (tmp < gamma) gamma = tmp;
     }
-    if (gamma < 0.001) gamma = 0.001;
+    if (gamma < lo) gamma = lo;
     gi = 1.0/gamma;
     if (message) Rprintf("Lambda %d: Gamma = %f\n", l+1, gamma);
     lp = l*p;
