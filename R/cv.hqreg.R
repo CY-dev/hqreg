@@ -1,6 +1,6 @@
-cv.hqreg <- function(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), seed) {
-  FUN <- match.arg(FUN)
-  FUN <- hqreg::FUN
+cv.hqreg <- function(X, y, ..., FUN = c(hqreg, hqreg_raw), ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), seed) {
+#  FUN <- match.arg(FUN)
+#  FUN <- hqreg::FUN
 #  FUN <- get(FUN)
   type.measure <- match.arg(type.measure)
   n <- length(y)
