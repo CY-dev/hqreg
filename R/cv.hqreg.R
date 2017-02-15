@@ -1,17 +1,18 @@
 cv.hqreg <- function(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), seed) {
   #requireNamespace("hqreg")
   FUN <- match.arg(FUN)
-  FUN <- if (FUN == "hqreg") hqreg else hqreg_raw
+  #FUN <- if (FUN == "hqreg") hqreg else hqreg_raw
   #FUN <- switch(FUN, "hqreg"=hqreg, "hqreg_raw"=hqreg_raw)
 #  FUN <- hqreg::FUN
-  #FUN <- get(FUN)
+  FUN <- get(FUN)
   type.measure <- match.arg(type.measure)
   n <- length(y)
   if (!missing(seed)) set.seed(seed)
   if(missing(fold.id)) fold.id <- ceiling(sample(1:n)/n*nfolds)
-
+  
   fit <- FUN(X, y, ...)
   cv.args <- list(...)
+  #fit <- do.call(FUN, c(list(X, y), cv.args))
   cv.args$lambda <- fit$lambda
   cv.args$alpha <- fit$alpha
   cv.args$gamma <- fit$gamma
@@ -33,7 +34,7 @@ cv.hqreg <- function(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfold
     cat("Start parallel computing for cross-validation...")
     clusterExport(cluster, c("fold.id", "X", "y", "cv.args", "measure.args"), 
                   envir=environment())
-    clusterCall(cluster, function() require(FUN))
+    clusterCall(cluster, function() require(hqreg))
     fold.results <- parLapply(cl = cluster, X = 1:nfolds, fun = cvf, XX = X, y = y, 
                               fold.id = fold.id, cv.args = cv.args, measure.args = measure.args)
     stopCluster(cluster)
