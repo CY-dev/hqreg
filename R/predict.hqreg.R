@@ -2,7 +2,8 @@ predict.hqreg <- function(object, X, lambda, type=c("response","coefficients","n
   type=match.arg(type)
   if (missing(X) && type == "response") stop("Need to supply 'X'")
   beta <- coef.hqreg(object, lambda = lambda, exact = exact)
-  intercept_added = (length(beta) > length(object$penalty.factor))
+  num_coef <- if (is.matrix(beta)) nrow(beta) else length(beta)
+  intercept_added <- (num_coef > length(object$penalty.factor))
   if (type == "coefficients") return(beta)
   if (intercept_added) {
     if (is.matrix(beta)) {
@@ -33,23 +34,24 @@ coef.hqreg <- function(object, lambda, exact = FALSE, ...) {
   } else if (exact) {
     # augment the lambda sequence with the new values, and refit the model
     ls <- object$lambda
-    ind <- match(lambda,ls,0)
+    ind <- match(lambda, ls, 0)
     if (any(ind == 0)) {
       ls <- unique(rev(sort(c(lambda,ls))))
-      object <- update(object,lambda=ls)
+      object <- update(object, lambda=ls)
+      ind <- match(lambda, ls)
     }
-    beta <- object$beta[, ls == lambda]
+    beta <- object$beta[, ind]
   } else {
     # use linear interpolation to estimate coefficients for supplied lambda
     ls <- object$lambda
     lambda[lambda>max(ls)] <- max(ls)
     lambda[lambda<min(ls)] <- min(ls)
-    ind <- approx(ls,seq(ls),lambda)$y
+    ind <- approx(ls, seq(ls), lambda)$y
     left <- floor(ind)
     right <- ceiling(ind)
     weight <- ind %% 1
     beta <- (1-weight)*object$beta[,left] + weight*object$beta[,right]
-    if (length(lambda) > 1) colnames(beta) <- round(lambda,4)
+    if (length(lambda) > 1) colnames(beta) <- round(lambda, 4)
   }
   beta
 }
