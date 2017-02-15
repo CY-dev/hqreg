@@ -1,10 +1,5 @@
 cv.hqreg <- function(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), seed) {
-  #requireNamespace("hqreg")
-  FUN <- match.arg(FUN)
-  #FUN <- if (FUN == "hqreg") hqreg else hqreg_raw
-  #FUN <- switch(FUN, "hqreg"=hqreg, "hqreg_raw"=hqreg_raw)
-#  FUN <- hqreg::FUN
-  FUN <- get(FUN)
+  FUN <- get(match.arg(FUN))
   type.measure <- match.arg(type.measure)
   n <- length(y)
   if (!missing(seed)) set.seed(seed)
