@@ -1,5 +1,5 @@
 cv.hqreg <- function(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfolds=10, fold.id, type.measure = c("deviance", "mse", "mae"), seed) {
-  requireNameSpace("hqreg")
+  requireNamespace("hqreg")
   FUN <- match.arg(FUN)
   #FUN <- switch(FUN, "hqreg"=hqreg, "hqreg_raw"=hqreg_raw)
 #  FUN <- hqreg::FUN
