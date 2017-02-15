@@ -4,13 +4,15 @@
 \description{Perform k-fold cross validation for elastic-net penalized Huber loss regression 
   and quantile regression over a sequence of lambda values and find an optimal lambda.}
 \usage{
-cv.hqreg(X, y, ..., ncores = 1, nfolds = 10, fold.id, 
+cv.hqreg(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfolds = 10, fold.id, 
          type.measure = c("deviance", "mse", "mae"), seed)
 }
 \arguments{
-  \item{X}{The input matrix, as in \code{hqreg}.}
-  \item{y}{The response vector, as in \code{hqreg}.}
-  \item{...}{Additional arguments to \code{hqreg}.}
+  \item{X}{The input matrix.}
+  \item{y}{The response vector.}
+  \item{...}{Additional arguments to \code{FUN}.}
+  \item{FUN}{Model fitting function. The default is "hqreg" which preprocesses the data internally. 
+  The other option is "hqreg_raw" which uses the raw data as is.}
   \item{ncores}{\code{cv.hqreg} can be run in parallel across a
   cluster using the \code{parallel} package. If \code{ncores > 1},a cluster is 
   created to run \code{cv.hqreg} in parallel. The code is run sequentially if 
