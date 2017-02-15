@@ -47,6 +47,12 @@ they should call \code{cv.hqreg} for each combination of these parameters and us
     error of the minimum.}
   \item{lambda.min}{The value of \code{lambda} with the minimum cross-validation error.}
 }
+\references{Yi, C. and Huang, J. (2016) 
+  \emph{Semismooth Newton Coordinate Descent Algorithm for 
+  Elastic-Net Penalized Huber Loss Regression and Quantile Regression},
+  \url{https://arxiv.org/abs/1509.02957} \cr
+  \emph{Journal of Computational and Graphical Statistics, accepted in Nov 2016} \cr
+  \url{http://www.tandfonline.com/doi/full/10.1080/10618600.2016.1256816}}
 \author{Congrui Yi <congrui-yi@uiowa.edu>}
 \seealso{\code{hqreg}, \code{plot.cv.hqreg}}
 \examples{
