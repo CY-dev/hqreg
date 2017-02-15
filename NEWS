@@ -25,4 +25,5 @@
 	* modify plot, predict function accordingly for the situation without an intercept
 
 1.3-5
-	* cv.hqreg: added a new argument FUN that take values from either "hqreg" or "hqreg_raw" to include cross validation functionality 	     for hqreg_raw.
+	* cv.hqreg: added a new argument FUN that take values from either "hqreg" or "hqreg_raw" to include cross validation
+	  functionality for hqreg_raw.
