@@ -1,29 +1,28 @@
 1.0
-	* Added support for L2 penalization(alpha=0);
-	* hqreg: changed argument "loss" to "method" and an option "squared" to "ls".
+    * Added support for L2 penalization(alpha=0);
+    * hqreg: changed argument "loss" to "method" and an option "squared" to "ls".
 
 1.1
-	* loss.hqreg.R: corrected a mistake in function "qloss".
+    * loss.hqreg.R: corrected a mistake in function "qloss".
 
 1.2
-	* cv.hqreg: added two new arguments, "fold.id" for predefined cross-validation 
-	  folds, and "type.measure" for inclusion of general error measures "mse" and 
-	  "mae".
-	* loss.hqreg: modified definition depending on "type.measure".
+    * cv.hqreg: added two new arguments, "fold.id" for predefined cross-validation 
+      folds, and "type.measure" for inclusion of general error measures "mse" and 
+      "mae".
+    * loss.hqreg: modified definition depending on "type.measure".
 
 1.3
-  	* cv.hqreg: enabled parallel computing for cross-validation with a new argument "ncores"
-  	* hqreg: set the default value of "gamma" for Huber loss to be IQR(y)/10
-  	* plot.hqreg, plot.cv.hqreg: changed argument "log.x" to "log.l"
-  	* removed computational redundancy and reduced memory allocation in source code
-	* corrected typos in documentation
+    * cv.hqreg: enabled parallel computing for cross-validation with a new argument "ncores"
+    * hqreg: set the default value of "gamma" for Huber loss to be IQR(y)/10
+    * plot.hqreg, plot.cv.hqreg: changed argument "log.x" to "log.l"
+    * removed computational redundancy and reduced memory allocation in source code
+    * corrected typos in documentation
 
-1.3-2
-  	* new function "hqreg_raw" for fitting models on raw data without preprocessing
-	* hqreg_raw contains a boolean argument "intercept" which can be set to FALSE to allow a "no-intercept" fit
-	* hqreg: no longer support preprocess = "none" since the package now has a specific function hqreg_raw for that situation
-	* modify plot, predict function accordingly for the situation without an intercept
-
-1.3-5
-	* cv.hqreg: added a new argument FUN that take values from either "hqreg" or "hqreg_raw" to include cross validation
-	  functionality for hqreg_raw.
+1.4
+    * new function "hqreg_raw" for fitting models on raw data without preprocessing
+    * hqreg_raw contains a boolean argument "intercept" which can be set to FALSE to allow a "no-intercept" fit
+    * hqreg: no longer support preprocess = "none" since the package now has a specific function hqreg_raw for that situation
+    * modified plot, predict function accordingly for the situation without an intercept
+    * cv.hqreg: added a new argument FUN that take values from either "hqreg" or "hqreg_raw" to include cross validation
+      functionality for hqreg_raw
+    * robustified the optimization algorithm for extreme cases in quantile regression when tau is close to 0 or 1
