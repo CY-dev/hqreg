@@ -1,4 +1,4 @@
-useDynLib(hqreg, .registration=TRUE)
+useDynLib(hqreg, .registration=TRUE, .fixes = "C_")
 export(hqreg, hqreg_raw, cv.hqreg)
 importFrom(graphics, plot)
 S3method(plot, hqreg)

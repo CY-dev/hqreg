@@ -1072,4 +1072,6 @@ static const R_CMethodDef cMethods[] = {
 void R_init_hqreg(DllInfo *info)
 {
   R_registerRoutines(info,cMethods,NULL,NULL,NULL);
+  R_useDynamicSymbols(info, FALSE);
+  R_forceSymbols(info, TRUE);
 }
