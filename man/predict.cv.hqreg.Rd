@@ -7,7 +7,7 @@ and the optimal value chosen for \code{lambda}.}
 \usage{
 \method{predict}{cv.hqreg}(object, X, lambda = c("lambda.1se","lambda.min"), 
     type = c("response","coefficients","nvars"), ...)
-\method{coef}{cv.hqreg}(object, lambda, ...)
+\method{coef}{cv.hqreg}(object, lambda = c("lambda.1se","lambda.min"), ...)
 }
 \arguments{
   \item{object}{Fitted \code{"hqreg"} model object.}
