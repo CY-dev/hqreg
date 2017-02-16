@@ -7,7 +7,6 @@ cv.hqreg <- function(X, y, ..., FUN = c("hqreg", "hqreg_raw"), ncores = 1, nfold
   
   fit <- FUN(X, y, ...)
   cv.args <- list(...)
-  #fit <- do.call(FUN, c(list(X, y), cv.args))
   cv.args$lambda <- fit$lambda
   cv.args$alpha <- fit$alpha
   cv.args$gamma <- fit$gamma

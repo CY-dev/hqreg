@@ -45,15 +45,15 @@ hqreg_raw <- function (X, y, method = c("huber", "quantile", "ls"), gamma = IQR(
   # Fitting
   if (alpha > 0) {
     if (method == "huber") {
-      fit <- .C("huber", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_huber, double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(scrflag), as.integer(intercept), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     } else if (method == "quantile") {
-      fit <- .C("quant", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_quant, double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(tau), as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), 
                 as.integer(ppflag), as.integer(scrflag), as.integer(intercept), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     } else {
-      fit <- .C("squared", double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_squared, double(p*nlambda), integer(nlambda), as.double(lambda), integer(1), integer(1), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(alpha), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag), as.integer(scrflag),
                 as.integer(intercept), as.integer(dfmax), as.integer(max.iter), as.integer(user), as.integer(message))
     }
@@ -69,15 +69,15 @@ hqreg_raw <- function (X, y, method = c("huber", "quantile", "ls"), gamma = IQR(
     lambda <- lambda[ind]
   } else {
     if (method == "huber") {
-      fit <- .C("huber_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_huber_l2, double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(gamma), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(intercept), as.integer(max.iter), as.integer(user), as.integer(message))
     } else if (method == "quantile") {
-      fit <- .C("quantile_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_quant_l2, double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(tau), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(intercept), as.integer(max.iter), as.integer(user), as.integer(message))      
     } else {
-      fit <- .C("squared_l2", double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_squared_l2, double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(intercept), as.integer(max.iter), as.integer(user), as.integer(message))      
     }
