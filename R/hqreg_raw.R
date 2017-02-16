@@ -73,7 +73,7 @@ hqreg_raw <- function (X, y, method = c("huber", "quantile", "ls"), gamma = IQR(
                 as.double(gamma), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(intercept), as.integer(max.iter), as.integer(user), as.integer(message))
     } else if (method == "quantile") {
-      fit <- .C(C_quantile_l2, double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
+      fit <- .C(C_quant_l2, double(p*nlambda), integer(nlambda), as.double(lambda), as.double(XX), as.double(yy), as.double(penalty.factor), 
                 as.double(tau), as.double(eps), as.double(lambda.min), as.integer(nlambda), as.integer(n), as.integer(p), as.integer(ppflag),
                 as.integer(intercept), as.integer(max.iter), as.integer(user), as.integer(message))      
     } else {

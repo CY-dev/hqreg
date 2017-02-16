@@ -1064,7 +1064,7 @@ static const R_CMethodDef cMethods[] = {
   {"quant", (DL_FUNC) &sncd_quantile, 22},
   {"squared", (DL_FUNC) &sncd_squared, 21},
   {"huber_l2", (DL_FUNC) &sncd_huber_l2, 17},
-  {"quantile_l2", (DL_FUNC) &sncd_quantile_l2, 17},
+  {"quant_l2", (DL_FUNC) &sncd_quantile_l2, 17},
   {"squared_l2", (DL_FUNC) &sncd_squared_l2, 16},
   {NULL}
 };
