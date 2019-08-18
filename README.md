@@ -11,4 +11,4 @@ To install:
 * the latest version (require `devtools`): `install_github("CY-dev/hqreg")`
 
 To report bugs：
-* send email to: Congrui Yi <congrui-yi@uiowa.edu>
+* send email to: Congrui Yi <congrui@amazon.com>
