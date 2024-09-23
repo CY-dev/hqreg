@@ -64,18 +64,18 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
-  double *x2 = Calloc(n*p, double); // x^2
-  double *shift = Calloc(p, double);
-  double *scale = Calloc(p, double);
-  double *beta_old = Calloc(p, double); 
-  double *r = Calloc(n, double);
-  double *s = Calloc(p, double);
-  double *d1 = Calloc(n, double);
-  double *d2 = Calloc(n, double);
-  double *z = Calloc(p, double); // partial derivative used for screening: X^t*d1/n
+  double *x2 = R_Calloc(n*p, double); // x^2
+  double *shift = R_Calloc(p, double);
+  double *scale = R_Calloc(p, double);
+  double *beta_old = R_Calloc(p, double); 
+  double *r = R_Calloc(n, double);
+  double *s = R_Calloc(p, double);
+  double *d1 = R_Calloc(n, double);
+  double *d2 = R_Calloc(n, double);
+  double *z = R_Calloc(p, double); // partial derivative used for screening: X^t*d1/n
   double cutoff;
-  int *include = Calloc(p, int);
-  int *nonconst = Calloc(p, int);
+  int *include = R_Calloc(p, int);
+  int *nonconst = R_Calloc(p, int);
   int violations = 0, nv = 0; 
   
   // Preprocessing
@@ -252,17 +252,17 @@ static void sncd_huber(double *beta, int *iter, double *lambda, int *saturated, 
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
-  Free(x2);
-  Free(shift);
-  Free(scale);
-  Free(beta_old);
-  Free(r);
-  Free(s);
-  Free(d1);
-  Free(d2);
-  Free(z);
-  Free(include);
-  Free(nonconst);
+  R_Free(x2);
+  R_Free(shift);
+  R_Free(scale);
+  R_Free(beta_old);
+  R_Free(r);
+  R_Free(s);
+  R_Free(d1);
+  R_Free(d2);
+  R_Free(z);
+  R_Free(include);
+  R_Free(nonconst);
 }
 
 static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
@@ -280,19 +280,19 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
-  double *x2 = Calloc(n*p, double); // x^2
-  double *shift = Calloc(p, double);
-  double *scale = Calloc(p, double);
-  double *beta_old = Calloc(p, double);
-  double *r = Calloc(n, double);
-  double *s = Calloc(p, double);
-  double *d = Calloc(n, double);
-  double *d1 = Calloc(n, double);
-  double *d2 = Calloc(n, double);
-  double *z = Calloc(p, double); // partial derivative used for screening: X^t*d1/n
+  double *x2 = R_Calloc(n*p, double); // x^2
+  double *shift = R_Calloc(p, double);
+  double *scale = R_Calloc(p, double);
+  double *beta_old = R_Calloc(p, double);
+  double *r = R_Calloc(n, double);
+  double *s = R_Calloc(p, double);
+  double *d = R_Calloc(n, double);
+  double *d1 = R_Calloc(n, double);
+  double *d2 = R_Calloc(n, double);
+  double *z = R_Calloc(p, double); // partial derivative used for screening: X^t*d1/n
   double cutoff;
-  int *include = Calloc(p, int);
-  int *nonconst = Calloc(p, int);
+  int *include = R_Calloc(p, int);
+  int *nonconst = R_Calloc(p, int);
   int violations = 0, nv = 0;
   if (tau >= 0.05 && tau <= 0.95) {
       m = n/10 + 1;
@@ -487,18 +487,18 @@ static void sncd_quantile(double *beta, int *iter, double *lambda, int *saturate
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
-  Free(x2);
-  Free(shift);
-  Free(scale);
-  Free(beta_old);
-  Free(r);
-  Free(s);
-  Free(d);
-  Free(d1);
-  Free(d2);
-  Free(z);
-  Free(include);
-  Free(nonconst);
+  R_Free(x2);
+  R_Free(shift);
+  R_Free(scale);
+  R_Free(beta_old);
+  R_Free(r);
+  R_Free(s);
+  R_Free(d);
+  R_Free(d1);
+  R_Free(d2);
+  R_Free(z);
+  R_Free(include);
+  R_Free(nonconst);
 }
 
 static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated, int *numv, double *x, double *y, 
@@ -515,17 +515,17 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   //scrflag = 0: no screening; scrflag = 1: Adaptive Strong Rule(ASR); scrflag = 2: Strong Rule(SR)
   // ASR fits an appropriate scrfactor adaptively; SR always uses scrfactor = 1
   int nnzero = 0; // number of nonzero variables
-  double *x2 = Calloc(n*p, double); // x^2
-  double *x2m = Calloc(p, double); // Column means of x2
-  double *shift = Calloc(p, double);
-  double *scale = Calloc(p, double);
-  double *beta_old = Calloc(p, double); 
-  double *r = Calloc(n, double);
-  double *s = Calloc(p, double);
-  double *z = Calloc(p, double); // X^t * r/n
+  double *x2 = R_Calloc(n*p, double); // x^2
+  double *x2m = R_Calloc(p, double); // Column means of x2
+  double *shift = R_Calloc(p, double);
+  double *scale = R_Calloc(p, double);
+  double *beta_old = R_Calloc(p, double); 
+  double *r = R_Calloc(n, double);
+  double *s = R_Calloc(p, double);
+  double *z = R_Calloc(p, double); // X^t * r/n
   double cutoff;
-  int *include = Calloc(p, int);
-  int *nonconst = Calloc(p, int);
+  int *include = R_Calloc(p, int);
+  int *nonconst = R_Calloc(p, int);
   int violations = 0, nv = 0;
 
   // Preprocessing
@@ -682,15 +682,15 @@ static void sncd_squared(double *beta, int *iter, double *lambda, int *saturated
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
   
-  Free(x2);
-  Free(x2m);
-  Free(shift);
-  Free(scale);
-  Free(beta_old);
-  Free(r);
-  Free(s);
-  Free(include);
-  Free(nonconst);
+  R_Free(x2);
+  R_Free(x2m);
+  R_Free(shift);
+  R_Free(scale);
+  R_Free(beta_old);
+  R_Free(r);
+  R_Free(s);
+  R_Free(include);
+  R_Free(nonconst);
 }
 
 // alpha = 0, pure l2 penalty
@@ -703,14 +703,14 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
   double gi = 1.0/gamma, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
-  double *x2 = Calloc(n*p, double); // x^2
-  double *shift = Calloc(p, double);
-  double *scale = Calloc(p, double);
-  double *beta_old = Calloc(p, double); 
-  double *r = Calloc(n, double);
-  double *d1 = Calloc(n, double);
-  double *d2 = Calloc(n, double);
-  int *nonconst = Calloc(p, int);
+  double *x2 = R_Calloc(n*p, double); // x^2
+  double *shift = R_Calloc(p, double);
+  double *scale = R_Calloc(p, double);
+  double *beta_old = R_Calloc(p, double); 
+  double *r = R_Calloc(n, double);
+  double *d1 = R_Calloc(n, double);
+  double *d2 = R_Calloc(n, double);
+  int *nonconst = R_Calloc(p, int);
   
   // Preprocessing
   if (ppflag == 1) {
@@ -805,14 +805,14 @@ static void sncd_huber_l2(double *beta, int *iter, double *lambda, double *x, do
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
-  Free(x2);
-  Free(shift);
-  Free(scale);
-  Free(beta_old);
-  Free(r);
-  Free(d1);
-  Free(d2);
-  Free(nonconst);
+  R_Free(x2);
+  R_Free(shift);
+  R_Free(scale);
+  R_Free(beta_old);
+  R_Free(r);
+  R_Free(d1);
+  R_Free(d2);
+  R_Free(nonconst);
 }
 
 static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
@@ -826,15 +826,15 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   int m, i, j, k, l, lp, jn; 
   double lo, gamma, gi, pct, lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
   double c = 2*tau-1.0; // coefficient for the linear term in quantile loss
-  double *x2 = Calloc(n*p, double); // x^2
-  double *shift = Calloc(p, double);
-  double *scale = Calloc(p, double);
-  double *beta_old = Calloc(p, double); 
-  double *r = Calloc(n, double);
-  double *d = Calloc(n, double);
-  double *d1 = Calloc(n, double);
-  double *d2 = Calloc(n, double);
-  int *nonconst = Calloc(p, int);
+  double *x2 = R_Calloc(n*p, double); // x^2
+  double *shift = R_Calloc(p, double);
+  double *scale = R_Calloc(p, double);
+  double *beta_old = R_Calloc(p, double); 
+  double *r = R_Calloc(n, double);
+  double *d = R_Calloc(n, double);
+  double *d1 = R_Calloc(n, double);
+  double *d2 = R_Calloc(n, double);
+  int *nonconst = R_Calloc(p, int);
   if (tau >= 0.05 && tau <= 0.95) {
       m = n/10 + 1;
       lo = 0.001;
@@ -949,15 +949,15 @@ static void sncd_quantile_l2(double *beta, int *iter, double *lambda, double *x,
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
   
-  Free(x2);
-  Free(shift);
-  Free(scale);
-  Free(beta_old);
-  Free(r);
-  Free(d);
-  Free(d1);
-  Free(d2);
-  Free(nonconst);
+  R_Free(x2);
+  R_Free(shift);
+  R_Free(scale);
+  R_Free(beta_old);
+  R_Free(r);
+  R_Free(d);
+  R_Free(d1);
+  R_Free(d2);
+  R_Free(nonconst);
 }
 
 static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, double *y, double *pf, 
@@ -970,13 +970,13 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   int max_iter = max_iter_[0]; int user = user_[0]; int message = message_[0];
   int i, j, k, l, lp, jn; 
   double lstep, v1, v2, tmp, change, nullDev, max_update, update, thresh;
-  double *x2 = Calloc(n*p, double); // x^2
-  double *x2m = Calloc(p, double); // Column means of x2
-  double *shift = Calloc(p, double);
-  double *scale = Calloc(p, double);
-  double *beta_old = Calloc(p, double); 
-  double *r = Calloc(n, double);
-  int *nonconst = Calloc(p, int);
+  double *x2 = R_Calloc(n*p, double); // x^2
+  double *x2m = R_Calloc(p, double); // Column means of x2
+  double *shift = R_Calloc(p, double);
+  double *scale = R_Calloc(p, double);
+  double *beta_old = R_Calloc(p, double); 
+  double *r = R_Calloc(n, double);
+  int *nonconst = R_Calloc(p, int);
   
   // Preprocessing
   if (ppflag == 1) {
@@ -1049,13 +1049,13 @@ static void sncd_squared_l2(double *beta, int *iter, double *lambda, double *x, 
   // Postprocessing
   if (ppflag) postprocess(beta, shift, scale, nonconst, nlam, p);
 
-  Free(x2);
-  Free(x2m);
-  Free(shift);
-  Free(scale);
-  Free(beta_old);
-  Free(r);
-  Free(nonconst);
+  R_Free(x2);
+  R_Free(x2m);
+  R_Free(shift);
+  R_Free(scale);
+  R_Free(beta_old);
+  R_Free(r);
+  R_Free(nonconst);
 }
 
 
