@@ -8,8 +8,8 @@
 \tabular{ll}{
 Package: \tab hqreg\cr
 Type: \tab Package\cr
-Version: \tab 1.4\cr
-Date: \tab 2017-2-15\cr
+Version: \tab 1.4-1\cr
+Date: \tab 2024-09-23\cr
 License: \tab GPL-3\cr
 }
 Very simple to use. Accepts \code{X,y} data for regression models, and
@@ -23,7 +23,7 @@ parameter \code{lambda}. Also provides functions for plotting, prediction and pa
   \emph{Journal of Computational and Graphical Statistics, accepted in Nov 2016} \cr
   \url{http://www.tandfonline.com/doi/full/10.1080/10618600.2016.1256816}}
 
-\author{Congrui Yi <congrui-yi@uiowa.edu>}
+\author{Congrui Yi <eric.ycr@gmail.com>}
 \examples{
 X = matrix(rnorm(1000*100), 1000, 100)
 beta = rnorm(10)

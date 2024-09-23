@@ -28,7 +28,7 @@ and the optimal value chosen for \code{lambda}.}
   \url{https://arxiv.org/abs/1509.02957} \cr
   \emph{Journal of Computational and Graphical Statistics, accepted in Nov 2016} \cr
   \url{http://www.tandfonline.com/doi/full/10.1080/10618600.2016.1256816}}
-\author{Congrui Yi <congrui-yi@uiowa.edu>}
+\author{Congrui Yi <eric.ycr@gmail.com>}
 \seealso{\code{\link{hqreg}} \code{\link{cv.hqreg}}}
 \examples{
 X = matrix(rnorm(1000*100), 1000, 100)

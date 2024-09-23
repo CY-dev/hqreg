@@ -9,6 +9,6 @@ env:
 notifications:
   email:
     recipients:
-      - congrui-yi@uiowa.edu
+      - eric.ycr@gmail.com
     on_success: change
     on_failure: change
