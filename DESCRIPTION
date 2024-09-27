@@ -2,10 +2,12 @@ Package: hqreg
 Type: Package
 Title: Regularization Paths for Lasso or Elastic-Net Penalized Huber Loss Regression and Quantile Regression
 Version: 1.4-1
-Date: 2024-09-23
-Author: Congrui Yi
-Maintainer: Congrui Yi <eric.ycr@gmail.com>
-Description: Efficient algorithms for fitting regularization paths for lasso or elastic-net penalized regression models with Huber loss, quantile loss or squared loss.
+Date: 2024-09-26
+Authors@R: person(given = "Congrui",
+                  family = "Yi",
+                  role = c("aut", "cre"),
+                  email = "eric.ycr@gmail.com")
+Description: Offers efficient algorithms for fitting regularization paths for lasso or elastic-net penalized regression models with Huber loss, quantile loss or squared loss. Reference: Congrui Yi and Jian Huang (2017) <doi:10.1080/10618600.2016.1256816>.
 License: GPL-3
-URL: http://arxiv.org/abs/1509.02957
+URL: https://github.com/CY-dev/hqreg
 Imports: parallel

@@ -85,12 +85,12 @@ hqreg_raw(X, y, method = c("huber", "quantile", "ls"),
     conditions. When violations occur, the program adds in violating variables and re-runs 
     the inner loop until convergence. \code{nv} is the number of violations.}
 }
-\references{Yi, C. and Huang, J. (2016) 
+\references{Yi, C. and Huang, J. (2017) 
   \emph{Semismooth Newton Coordinate Descent Algorithm for 
   Elastic-Net Penalized Huber Loss Regression and Quantile Regression},
-  \url{https://arxiv.org/abs/1509.02957} \cr
-  \emph{Journal of Computational and Graphical Statistics, accepted in Nov 2016} \cr
-  \url{http://www.tandfonline.com/doi/full/10.1080/10618600.2016.1256816}}
+  \doi{10.1080/10618600.2016.1256816} \cr
+  \emph{Journal of Computational and Graphical Statistics} \cr
+}
 \author{Congrui Yi <eric.ycr@gmail.com>}
 \seealso{\code{\link{plot.hqreg}}, \code{\link{cv.hqreg}}}
 \examples{
