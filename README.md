@@ -1,6 +1,6 @@
 <!-- badges: start -->
-[![CRAN version](https://img.shields.io/cran/v/hqreg?logo=R)](https://cran.r-project.org/package=hqreg)
-[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/hqreg)]
+[![CRAN](https://img.shields.io/cran/v/hqreg?logo=R)](https://cran.r-project.org/package=hqreg)
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/hqreg)](https://cranlogs.r-pkg.org/badges/grand-total/hqreg)
 <!-- badges: end -->
 
 # hqreg
